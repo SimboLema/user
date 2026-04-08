@@ -1,0 +1,54 @@
+@media (min-width: 576px) {
+            .modal-md-custom {
+                max-width: 600px;
+            }
+        }
+
+        #toast-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1060;
+        }
+
+        .custom-toast {
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid;
+        }
+
+        .toast-success {
+            border-left-color: #198754;
+        }
+
+        .toast-warning {
+            border-left-color: #ffc107;
+        }
+
+        .toast-danger {
+            border-left-color: #dc3545;
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .toast-body {
+            font-size: 0.95rem;
+        }
+
+        .risk-header {
+            background-color: #dc3545;
+            border-radius: 0.5rem;
+        }
+
+        .section-icon {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+
+        .card-flush {
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }

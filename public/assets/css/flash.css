@@ -1,0 +1,74 @@
+#flash-message {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: red;
+      border: 1px solid #a31818;
+      border-radius: 5px;
+      padding: 10px;
+      display: none;
+      animation: flash-message-animation 1s forwards;
+      z-index: 9999; /* Set a high z-index to ensure it appears on top of all content */
+
+    }
+#flash-message-success {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: green;
+      border: 1px solid #27ae60;
+      border-radius: 5px;
+      padding: 10px;
+      display: none;
+      animation: flash-message-animation 1s forwards;
+      z-index: 9999; /* Set a high z-index to ensure it appears on top of all content */
+
+    }
+#flash-message-warning {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #ff9900;
+      border: 1px solid #fdec00;
+      border-radius: 5px;
+      padding: 10px;
+      display: none;
+      animation: flash-message-animation 1s forwards;
+      z-index: 9999; /* Set a high z-index to ensure it appears on top of all content */
+
+    }
+    
+    .progress-bar {
+      height: 4px;
+      background-color: #27ae60;
+      width: 100%;
+      animation: progress-bar-animation 1s linear;
+    }
+    
+    @keyframes progress-bar-animation {
+      0% {
+        width: 100%;
+      }
+      100% {
+        width: 0%;
+      }
+    }
+    
+    @keyframes flash-message-animation {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .flashmessage {
+        color: white; /* Set text color to white */
+        font-weight:bold;
+        padding: 3px 5px; /* Add padding to create space around the text */
+        border-radius: 3px; /* Add rounded corners for a button-like effect */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); 
+    }

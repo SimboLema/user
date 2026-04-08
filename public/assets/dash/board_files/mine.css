@@ -1,0 +1,40 @@
+    body {
+      background-color: #f1f3f6;
+      font-family: "Poppins", sans-serif;
+    }
+
+    .page-title {
+      font-weight: 600;
+      color: #344767;
+    }
+
+    .card {
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.4em 0.6em;
+    }
+
+    .form-control, .form-select {
+      border-radius: 10px;
+    }
+
+    .table thead {
+      background-color: #e9ecef;
+    }
+
+    .modal-content {
+      border-radius: 12px;
+    }
+
+    .modal-title {
+      font-weight: 600;
+    }
+
+    .btn-sm {
+      padding: 0.35rem 0.65rem;
+    }
