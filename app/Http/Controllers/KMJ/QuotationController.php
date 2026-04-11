@@ -38,6 +38,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Mail\QuotationCreatedMail;
+use App\Mail\QuotationApprovedMail;
 use Illuminate\Support\Facades\Mail;
 
 class QuotationController extends Controller
@@ -707,5 +708,34 @@ class QuotationController extends Controller
             });
 
         return response()->json($quotations);
+    }
+
+    //Sending email when quotation is verified
+    public function verify(Request $request, $id)
+    {
+        try {
+            $quotation = Quotation::findOrFail($id);
+
+            // Update quotation status to verified
+            $quotation->update([
+                'status' => 'verified', // or whatever your status field is
+                'updated_by' => Auth::id(),
+            ]);
+
+            // Send verification email to insurer
+            $insurer = $quotation->insuarer;
+            if ($insurer && $insurer->email) {
+                Mail::to($insurer->email)->send(new QuotationApprovedMail($quotation));
+            }
+
+            return redirect()
+                ->route('kmj.quotation')
+                ->with('success', 'Quotation Verified Successfully! Email sent to insurer.');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error: ' . $e->getMessage(),
+            ]);
+        }
     }
 }

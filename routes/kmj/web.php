@@ -33,6 +33,8 @@ use App\Mail\QuotationCreatedMail;
 use App\Models\Models\KMJ\Quotation;
 use Illuminate\Support\Facades\Mail;
 
+
+
 Route::get('/test-mail', function () {
     $quotation = Quotation::with(['customer', 'coverage.product', 'insuarer'])->first();
 

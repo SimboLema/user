@@ -10,7 +10,7 @@
                 <div class="modal-body row g-3">
                     <div class="col-md-12">
                         <label class="form-label">Insuarer name:</label>
-                        <select class="form-select select2" id="insuranceSelect" name="insurance_id" required>
+                        <select class="form-select select2" id="insuarerSelect" name="insuarer_id" required>
                             <option value="">-- Select Insuarer --</option>
                             @foreach ($insuarers as $insuarer)
                                 <option value="{{ $insuarer->id }}">{{ $insuarer->name }}</option>
