@@ -40,9 +40,16 @@ use Illuminate\Support\Facades\Log;
 use App\Mail\QuotationCreatedMail;
 use App\Mail\QuotationApprovedMail;
 use Illuminate\Support\Facades\Mail;
+use App\Services\WhatsAppService;
 
 class QuotationController extends Controller
 {
+    protected WhatsappService $whatsAppService;
+
+    public function __construct(WhatsappService $whatsAppService)
+    {
+        $this->whatsAppService = $whatsAppService;
+    }
     public function index()
     {
         $quotations = Quotation::orderBy('id', 'desc')->get();
@@ -520,6 +527,9 @@ class QuotationController extends Controller
                 Mail::to($insurer->email)->send(new QuotationCreatedMail($quotation));
             }
 
+            //send whatsapp sms to insuarer
+            $this->sendQuotationToInsurer($quotation, $insurer);
+
             return redirect()
                 ->route('kmj.quotation')
                 ->with('success', 'Quotation Created Successfully!');
@@ -532,6 +542,45 @@ class QuotationController extends Controller
             ]);
         }
     }
+
+    //function ya kutuma sms za whatsaap kwa insuarer
+
+    private function sendQuotationToInsurer($quotation, $insuarer)
+    {
+        try {
+            // Check if insurer has a phone number
+            if (!$insuarer->phone) {
+                Log::warning('Insurer ' . $insuarer->id . ' does not have a phone number');
+                return;
+            }
+
+            // Format phone number (remove any non-numeric characters)
+            $phoneNumber = preg_replace('/[^0-9]/', '', $insuarer->phone);
+
+            // Build the message
+            $message = "Hello " . $insuarer->name . ",\n\n";
+            $message .= "A new quotation has been created for your review.\n\n";
+            $message .= "Quotation Details:\n";
+            $message .= "- Customer: " . $quotation->customer->name . "\n";
+            $message .= "- Registration: " . $quotation->registration_number . "\n";
+            $message .= "- Premium: " . number_format($quotation->total_premium_including_tax, 2) . " " . $quotation->currency->code . "\n";
+            $message .= "- Start Date: " . $quotation->cover_note_start_date->format('d-m-Y') . "\n\n";
+            $message .= "Please log in to the system to review and approve.\n\n";
+            $message .= "Quotation Reference: #" . $quotation->id;
+
+            // Send via WhatsApp
+            $result = $this->whatsAppService->sendTextMessage($phoneNumber, $message);
+
+            if ($result['success']) {
+                Log::info('WhatsApp message sent to insurer ' . $insuarer->id);
+            } else {
+                Log::error('Failed to send WhatsApp to insurer: ' . json_encode($result));
+            }
+        } catch (\Exception $e) {
+            Log::error('Error sending WhatsApp to insurer: ' . $e->getMessage());
+        }
+    }
+
 
     // tabs
     // Covernote tab
@@ -738,4 +787,6 @@ class QuotationController extends Controller
             ]);
         }
     }
+
+
 }

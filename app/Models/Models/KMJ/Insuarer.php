@@ -13,6 +13,7 @@ class Insuarer extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
         'Company_code',
         'Insuarer_code',
     ];

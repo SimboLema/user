@@ -15,7 +15,7 @@ class CustomerSeeder extends Seeder
     {
         $customers = [
             [
-                'name' => 'KISWIGU Juma',
+                'name' => 'Baraka Juma',
                 'dob' => '1950-02-05',
                 'policy_holder_type_id' => 1,
                 'policy_holder_id_number' => 'T143041786',
@@ -23,7 +23,7 @@ class CustomerSeeder extends Seeder
                 'gender' => 'M',
                 'district_id' => 1, // lazima u-match na districts table yako
                 'street' => 'Sinza, Ngamia Street',
-                'phone' => '255713525539',
+                'phone' => '255680522062',
                 'fax' => null,
                 'postal_address' => 'P.O.BOX 1233, Dar es Salaam',
                 'email_address' => '',

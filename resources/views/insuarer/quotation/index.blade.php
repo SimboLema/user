@@ -267,10 +267,10 @@
 
                                                         @if (in_array($quotation->status ?? 'pending', ['pending']))
                                                             <div class="d-flex gap-1">
-                                                                <form action="{{ route('insuarer.quotation.updateStatus', $quotation->id) }}"
+                                                                <form action="{{ route('insuarer.quotation.updateStatusApprove', $quotation->id) }}"
                                                                       method="POST" class="d-inline">
                                                                     @csrf
-                                                                    @method('PUT')
+                                                                    @method('POST')
                                                                     <input type="hidden" name="status" value="approved">
                                                                     <button type="submit" class="btn btn-sm btn-light-success rounded-pill px-3"
                                                                             title="Approve this quotation">
@@ -278,7 +278,7 @@
                                                                     </button>
                                                                 </form>
 
-                                                                <form action="{{ route('insuarer.quotation.updateStatus', $quotation->id) }}"
+                                                                <form action="{{ route('insuarer.quotation.updateStatusReject', $quotation->id) }}"
                                                                       method="POST" class="d-inline">
                                                                     @csrf
                                                                     @method('PUT')

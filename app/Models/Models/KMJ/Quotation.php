@@ -113,9 +113,20 @@ class Quotation extends Model
         'updated_by',
 
         'status',
+        'approved_by',
+        'approved_at',
+        'rejected_by',
+        'rejected_at',
+        'rejection_reason',
         'description',
         //        'uploads',
 
+    ];
+    protected $dates = [
+        'cover_note_start_date',
+        'cover_note_end_date',
+        'approved_at',      // ADD THIS
+        'rejected_at',      // ADD THIS
     ];
 
     // -------------------------
@@ -208,4 +219,27 @@ class Quotation extends Model
     return $this->belongsTo(Insuarer::class, 'insuarer_id');
 }
 
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function rejectedBy()
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
+    }
 }

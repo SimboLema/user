@@ -12,6 +12,7 @@ use App\Http\Controllers\KMJ\RenewalController;
 use App\Http\Controllers\TestEmailController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KMJ\AdminInsuarerController;
+use App\Http\Controllers\WhatsAppWebhookController;
 
 
 
@@ -42,6 +43,8 @@ Route::get('/download-certificates', [DownloadCertificateController::class, 'dow
 Route::get('/renewals', [RenewalController::class, 'renewals'])->name('kmj.renewals');
 
 Route::post('/send-test-email', [TestEmailController::class, 'send']);
+
+Route::post('/webhook/whatsapp', [WhatsAppWebhookController::class, 'handleWebhook'])->name('whatsapp.webhook');
 
 include_once('Strategies_api.php');
 include_once('mua_api.php');

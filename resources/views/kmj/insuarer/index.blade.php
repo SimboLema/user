@@ -1,122 +1,337 @@
 @extends('kmj.layouts.app')
 
-@section('title', 'Dashboard')
+@section('title', 'Insurers Directory')
 
 @section('content')
-<div class="d-flex flex-column flex-lg-row">
-    <div id="kt_sidebar_menu" class="bg-white shadow-sm rounded-4 me-lg-10 mb-10 mb-lg-0 border border-gray-200" style="width: 100%; max-width: 350px; min-width: 300px; height: fit-content;">
-        <div class="p-8"> <div class="mb-10 px-3">
-                <h3 class="fw-bolder fs-2 text-dark mb-2">Management</h3>
-                <p class="text-muted fs-7">Overview & Actions</p>
-            </div>
-
-            <ul class="nav flex-column">
-                <li class="nav-item mb-4">
-                    <a href="{{ route('dashboard') }}" class="nav-link py-4 px-5 text-gray-700 text-hover-primary d-flex align-items-center rounded-3 shadow-sm-hover transition-all">
-                        <i class="bi bi-grid-1x2 me-4 fs-3"></i>
-                        <span class="fw-bold fs-5">Dashboard</span>
-                    </a>
-                </li>
-                <li class="nav-item mb-4">
-                    <a href="#" class="nav-link py-4 px-5 d-flex align-items-center active bg-light-primary rounded-3">
-                        <i class="bi bi-shield-check me-4 fs-3 text-primary"></i>
-                        <span class="fw-bolder fs-5 text-primary">Insurers List</span>
-                    </a>
-                </li>
-                <li class="nav-item mb-4">
-                    <a href="#" class="nav-link py-4 px-5 text-gray-700 text-hover-primary d-flex align-items-center rounded-3">
-                        <i class="bi bi-graph-up me-4 fs-3"></i>
-                        <span class="fw-bold fs-5">Reports</span>
-                    </a>
-                </li>
-
-                <div class="separator separator-dashed my-8 border-gray-300"></div>
-
-                <li class="nav-item">
-                    <a href="#" class="nav-link py-4 px-5 text-gray-700 text-hover-primary d-flex align-items-center rounded-3">
-                        <i class="bi bi-gear me-4 fs-3"></i>
-                        <span class="fw-bold fs-5">Settings</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="flex-row-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-8">
-            <h1 class="fw-bold text-dark m-0">Insurers Directory</h1>
-            <button type="button" class="btn btn-primary btn-sm px-6 py-3 shadow-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#kt_modal_add_insuarer">
-                <i class="bi bi-plus-lg me-2"></i> Add New Insurer
-            </button>
-        </div>
-
-        <div class="row g-5">
-            @foreach($insuarers as $insuarer)
-            <div class="col-xl-4 col-md-6">
-                <div class="card border-0 shadow-sm h-100 hover-elevate-up" style="background-color: rgba(245, 248, 250, 0.7);">
-                    <div class="card-body p-8 text-center">
-                        <div class="symbol symbol-60px symbol-circle mb-5 shadow-sm">
-                            <span class="symbol-label bg-white">
-                                <i class="bi bi-building fs-1 text-primary"></i>
-                            </span>
-                        </div>
-                        <div class="mb-2">
-                            <span class="text-gray-800 fw-bolder fs-5 d-block">{{ $insuarer->name }}</span>
-                            <span class="text-muted fw-bold fs-7">{{ $insuarer->email }}</span>
-                        </div>
-                        <div class="mt-5">
-                            <button class="btn btn-sm btn-light-primary fw-bold">View Profile</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</div>
 
 <style>
-    /* New Sidebar Enhancements */
-    .nav-link {
-        transition: all 0.2s ease-in-out;
+    @keyframes gradientShift {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
-    .nav-link:hover:not(.active) {
-        background-color:
-        transform: translateX(5px);
+    .insurer-card {
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
+        background-color: #f5f8fa;
+        border: none;
     }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-
-    .hover-elevate-up {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .hover-elevate-up:hover {
+    .insurer-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+        box-shadow: 0 0.75rem 2rem rgba(0, 49, 83, 0.12) !important;
     }
-    .bg-light-primary {
-        background-color:
+
+    .nav-link-item {
+        transition: all 0.2s ease-in-out;
+        border-radius: 0.5rem;
+    }
+    .nav-link-item:hover {
+        background-color: rgba(0, 49, 83, 0.06);
+        transform: translateX(4px);
+        color: #003153 !important;
+    }
+    .nav-link-item.active-nav {
+        background-color: rgba(0, 49, 83, 0.08);
+    }
+    .nav-link-item.active-nav span,
+    .nav-link-item.active-nav i {
+        color: #003153 !important;
+    }
+
+    .insurer-icon-wrap {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 12px rgba(0,49,83,0.10);
+        margin: 0 auto 1rem auto;
+    }
+
+    .btn-sage {
+        background-color: #9aa89b;
+        color: #fff;
+        border: none;
+    }
+    .btn-sage:hover {
+        background-color: #8a9889;
+        color: #fff;
+    }
+
+    .badge-insurer-count {
+        background-color: rgba(0,49,83,0.08);
+        color: #003153;
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
     }
 </style>
+
+<!--begin::Content wrapper-->
+<div class="d-flex flex-column flex-column-fluid">
+
+    <!--begin::Toolbar-->
+    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-18">
+        <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
+
+            <!--begin::Page title-->
+            <div class="page-title d-flex flex-column justify-content-center me-3">
+                <h1 class="page-heading d-flex text-white fw-bold fs-3 flex-column justify-content-center my-0"
+                    style="color: #003153 !important;">
+                    Insurance Portal
+                </h1>
+                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+                    <li class="breadcrumb-item text-muted">
+                        <a href="{{ route('dashboard') }}" class="text-muted text-hover-primary">Home |</a>
+                    </li>
+                    <li class="breadcrumb-item text-muted">Insurers Directory</li>
+                </ul>
+            </div>
+            <!--end::Page title-->
+
+            <!--begin::Actions-->
+            <div class="d-flex align-items-center">
+                <div class="toolbar-select form-floating w-175px h-55px me-4 bg-white rounded">
+                    <div class="h-55px d-flex align-items-center justify-content-center">
+                        <span class="fs-5 fw-bold" style="color: #003153 !important;">Insurers</span>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-sm me-3 btn-sage">
+                    <span>Support</span>
+                </a>
+            </div>
+            <!--end::Actions-->
+
+        </div>
+    </div>
+    <!--end::Toolbar-->
+
+    <!--begin::Content-->
+    <div id="kt_app_content" class="app-content flex-column-fluid">
+        <div id="kt_app_content_container" class="app-container container-xxl">
+
+            <div class="row gx-5 gx-xl-10">
+
+                <!--begin::Left Sidebar Col-->
+                <div class="col-xl-3 mb-10">
+                    <div class="card card-flush h-xl-100">
+
+                        <!--begin::Gradient Header (matches dashboard style)-->
+                        <div class="card-header rounded bgi-no-repeat bgi-size-cover align-items-start h-200px"
+                            style="background: linear-gradient(135deg, #9aa89b 0%, #9aa89b 60%, #7a9880 100%);
+                                   background-size: 300% 300%;
+                                   animation: gradientShift 10s ease infinite;"
+                            data-bs-theme="light">
+                            <h3 class="card-title align-items-start flex-column text-white pt-12">
+                                <span class="fw-bold fs-2 mb-1">Management</span>
+                                <span class="text-white opacity-75 fs-7 fw-semibold">Overview &amp; Actions</span>
+                            </h3>
+                        </div>
+                        <!--end::Gradient Header-->
+
+                        <!--begin::Body-->
+                        <div class="card-body mt-n10">
+                            <div class="mt-n10 position-relative">
+                                <div class="bg-white rounded-3 shadow-sm p-6 mb-5">
+                                    <ul class="nav flex-column gap-2">
+                                        <li class="nav-item">
+                                            <a href="{{ route('dashboard') }}"
+                                               class="nav-link-item nav-link py-3 px-4 text-gray-700 d-flex align-items-center">
+                                                <i class="bi bi-house me-3 fs-4" style="color:#003153;"></i>
+                                                <span class="fw-bold fs-6">Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('admin.insuarers.index') }}"
+                                               class="nav-link-item nav-link py-3 px-4 d-flex align-items-center active-nav">
+                                                <i class="bi bi-shield-check me-3 fs-4" style="color:#003153;"></i>
+                                                <span class="fw-bolder fs-6" style="color:#003153;">Insurers List</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('kmj.quotation') }}"
+                                               class="nav-link-item nav-link py-3 px-4 text-gray-700 d-flex align-items-center">
+                                                <i class="bi bi-archive me-3 fs-4" style="color:#003153;"></i>
+                                                <span class="fw-bold fs-6">Quotation</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="{{ route('kmj.report') }}"
+                                               class="nav-link-item nav-link py-3 px-4 text-gray-700 d-flex align-items-center">
+                                                <i class="bi bi-graph-up me-3 fs-4" style="color:#003153;"></i>
+                                                <span class="fw-bold fs-6">Reports</span>
+                                            </a>
+                                        </li>
+
+                                        <li><div class="separator separator-dashed my-3 border-gray-300"></div></li>
+
+                                        <li class="nav-item">
+                                            <a href="#"
+                                               class="nav-link-item nav-link py-3 px-4 text-gray-700 d-flex align-items-center">
+                                                <i class="bi bi-gear me-3 fs-4" style="color:#003153;"></i>
+                                                <span class="fw-bold fs-6">Settings</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!--begin::Quick Stats-->
+                                <div class="bg-gray-100 rounded-3 px-6 py-5 shadow-sm">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <i class="bi bi-building fs-2 me-3" style="color:#003153;"></i>
+                                        <div>
+                                            <span class="fw-bold fs-6 text-gray-700 d-block">Total Insurers</span>
+                                            <span class="fw-bolder fs-2" style="color:#003153;">
+                                                {{ $insuarers->count() }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button type="button"
+                                            class="btn btn-sage btn-sm w-100 mt-2"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#kt_modal_add_insuarer">
+                                        <i class="bi bi-plus-lg me-2 text-white"></i>
+                                        <span>Add New Insurer</span>
+                                    </button>
+                                </div>
+                                <!--end::Quick Stats-->
+                            </div>
+                        </div>
+                        <!--end::Body-->
+
+                    </div>
+                </div>
+                <!--end::Left Sidebar Col-->
+
+                <!--begin::Main Content Col-->
+                <div class="col-xl-9 mb-10">
+
+                    <!--begin::Header Row-->
+                    <div class="d-flex justify-content-between align-items-center mb-8">
+                        <div>
+                            <h2 class="fw-bolder mb-1" style="color:#003153;">Insurers Directory</h2>
+                            <span class="text-muted fw-semibold fs-7">All registered insurance providers</span>
+                        </div>
+                        <button type="button"
+                                class="btn btn-sm btn-sage px-6 py-3 d-flex align-items-center shadow-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#kt_modal_add_insuarer">
+                            <i class="bi bi-plus-lg me-2 text-white"></i>
+                            <span>Add New Insurer</span>
+                        </button>
+                    </div>
+                    <!--end::Header Row-->
+
+                    <!--begin::Insurer Cards Grid-->
+                    <div class="row g-5">
+                        @foreach($insuarers as $insuarer)
+                        <div class="col-xl-4 col-md-6">
+                            <div class="card insurer-card h-100 shadow-sm">
+                                <div class="card-body p-8 text-center">
+
+                                    <!--begin::Icon-->
+                                    <div class="insurer-icon-wrap mb-5">
+                                        <i class="bi bi-building fs-1" style="color:#003153;"></i>
+                                    </div>
+                                    <!--end::Icon-->
+
+                                    <!--begin::Info-->
+                                    <span class="text-gray-800 fw-bolder fs-5 d-block mb-1">
+                                        {{ $insuarer->name }}
+                                    </span>
+                                    <span class="text-muted fw-semibold fs-7 d-block mb-1">
+                                        {{ $insuarer->email }}
+                                    </span>
+                                    @if(isset($insuarer->phone))
+                                    <span class="text-muted fw-semibold fs-8 d-block mb-4">
+                                        <i class="bi bi-telephone me-1" style="color:#9aa89b;"></i>
+                                        {{ $insuarer->phone }}
+                                    </span>
+                                    @endif
+                                    <!--end::Info-->
+
+                                    <!--begin::Divider-->
+                                    <div class="separator separator-dashed my-4 border-gray-200"></div>
+                                    <!--end::Divider-->
+
+                                    <!--begin::Action-->
+                                    <div class="d-flex justify-content-center gap-3">
+                                        <a href="#"
+                                           class="btn btn-sm btn-sage px-5 fw-bold">
+                                            View Profile
+                                        </a>
+                                        <button class="btn btn-sm btn-light px-4 fw-bold text-gray-700">
+                                            <i class="bi bi-three-dots fs-5"></i>
+                                        </button>
+                                    </div>
+                                    <!--end::Action-->
+
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+
+                        @if($insuarers->isEmpty())
+                        <div class="col-12">
+                            <div class="card card-flush">
+                                <div class="card-body text-center py-20">
+                                    <i class="bi bi-building-x fs-5x mb-5 d-block" style="color:#9aa89b;"></i>
+                                    <h4 class="fw-bold text-gray-700 mb-2">No Insurers Found</h4>
+                                    <p class="text-muted fw-semibold mb-6">No insurance providers have been added yet.</p>
+                                    <button type="button"
+                                            class="btn btn-sage px-8"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#kt_modal_add_insuarer">
+                                        <i class="bi bi-plus-lg me-2 text-white"></i> Add First Insurer
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                    <!--end::Insurer Cards Grid-->
+
+                </div>
+                <!--end::Main Content Col-->
+
+            </div>
+            <!--end::Row-->
+
+        </div>
+    </div>
+    <!--end::Content-->
+
+</div>
+<!--end::Content wrapper-->
+
+<!--begin::Add Insurer Modal-->
 <div class="modal fade" id="kt_modal_add_insuarer" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered mw-650px">
-        <div class="modal-content rounded-4">
-            <div class="modal-header pb-0 border-0 justify-content-end">
-                <div class="btn btn-sm btn-icon btn-active-color-primary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg fs-2"></i>
+        <div class="modal-content rounded-4 shadow-lg">
+
+            <!--begin::Modal Header (styled like dashboard gradient)-->
+            <div class="modal-header border-0 pb-0 pt-0 rounded-top-4 overflow-hidden"
+                 style="background: linear-gradient(135deg, #9aa89b 0%, #7a9880 100%); height: 80px;">
+                <div class="d-flex align-items-center ps-10 pt-2">
+                    <i class="bi bi-shield-plus fs-2 text-white me-3"></i>
+                    <h5 class="text-white fw-bold mb-0 fs-4">New Insurance Provider</h5>
+                </div>
+                <div class="btn btn-sm btn-icon me-3 mt-3" data-bs-dismiss="modal"
+                     style="color:rgba(255,255,255,0.8);">
+                    <i class="bi bi-x-lg fs-3"></i>
                 </div>
             </div>
+            <!--end::Modal Header-->
 
-            <div class="modal-body scroll-y px-10 px-lg-15 pt-0 pb-15">
-                    
+            <div class="modal-body scroll-y px-10 px-lg-15 pt-8 pb-15">
+
                 <form action="{{ route('admin.insuarers.store') }}" method="POST">
                     @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
+                        <div class="alert alert-danger rounded-3 mb-6">
+                            <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
@@ -124,57 +339,91 @@
                         </div>
                     @endif
                     @csrf
-                    <div class="mb-13 text-center">
-                        <h1 class="mb-3 text-dark fw-bold">Add New Insurer</h1>
-                        <div class="text-muted fw-bold fs-5">Create a new account for the insurance provider</div>
+
+                    <div class="mb-10 text-center">
+                        <div class="text-muted fw-semibold fs-6">
+                            Fill in the details below to create a new insurer account
+                        </div>
                     </div>
 
                     <div class="fv-row mb-7">
-                        <label class="required fs-6 fw-bold mb-2">Full Name</label>
-                        <input type="text" class="form-control form-control-solid bg-gray-100 border-0" name="name" placeholder="e.g. Jubilee Insurance" required />
-                    </div>
-
-                   
-
-                    <div class="fv-row mb-7">
-                        <label class="required fs-6 fw-bold mb-2">Company Code</label>
-                        <input type="text" class="form-control form-control-solid bg-gray-100 border-0" name="company_code"  required />
+                        <label class="required fs-6 fw-bold mb-2 text-gray-700">Full Name</label>
+                        <input type="text"
+                               class="form-control form-control-solid bg-gray-100 border-0"
+                               name="name"
+                               placeholder="e.g. Jubilee Insurance"
+                               required />
                     </div>
 
                     <div class="fv-row mb-7">
-                        <label class="required fs-6 fw-bold mb-2">Insuarer Code</label>
-                        <input type="text" class="form-control form-control-solid bg-gray-100 border-0" name="insuarer_code" required />
+                        <label class="required fs-6 fw-bold mb-2 text-gray-700">Company Code</label>
+                        <input type="text"
+                               class="form-control form-control-solid bg-gray-100 border-0"
+                               name="company_code"
+                               required />
                     </div>
 
                     <div class="fv-row mb-7">
-                        <label class="required fs-6 fw-bold mb-2">Email Address</label>
-                        <input type="email" class="form-control form-control-solid bg-gray-100 border-0" name="email" placeholder="contact@insurer.com" required />
+                        <label class="required fs-6 fw-bold mb-2 text-gray-700">Insurer Code</label>
+                        <input type="text"
+                               class="form-control form-control-solid bg-gray-100 border-0"
+                               name="insuarer_code"
+                               required />
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fs-6 fw-bold mb-2 text-gray-700">Email Address</label>
+                        <input type="email"
+                               class="form-control form-control-solid bg-gray-100 border-0"
+                               name="email"
+                               placeholder="contact@insurer.com"
+                               required />
+                    </div>
+
+                    <div class="fv-row mb-7">
+                        <label class="required fs-6 fw-bold mb-2 text-gray-700">Phone Number</label>
+                        <input type="text"
+                               class="form-control form-control-solid bg-gray-100 border-0"
+                               name="phone"
+                               placeholder="07XXXXXXXX"
+                               required />
                     </div>
 
                     <div class="fv-row mb-10">
-                        <label class="required fs-6 fw-bold mb-2">Password</label>
+                        <label class="required fs-6 fw-bold mb-2 text-gray-700">Password</label>
                         <div class="position-relative">
-                            <input type="password" class="form-control form-control-solid bg-gray-100 border-0" name="password" id="password_input" required />
-                            <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2" onclick="togglePassword()">
-                                <i class="bi bi-eye-slash fs-2"></i>
+                            <input type="password"
+                                   class="form-control form-control-solid bg-gray-100 border-0"
+                                   name="password"
+                                   id="password_input"
+                                   required />
+                            <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2"
+                                  onclick="togglePassword()">
+                                <i class="bi bi-eye-slash fs-2 text-muted"></i>
                             </span>
                         </div>
                         <div class="text-muted fs-8 mt-2">Use 6 or more characters.</div>
                     </div>
 
-                   
+                    <div class="separator separator-dashed my-6 border-gray-200"></div>
 
-                    <div class="text-center">
-                        <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary px-10">
+                    <div class="text-center d-flex justify-content-center gap-4">
+                        <button type="reset" class="btn btn-light px-8 fw-bold" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-sage px-10 fw-bold">
+                            <i class="bi bi-check2 me-2 text-white"></i>
                             Create Account
                         </button>
                     </div>
+
                 </form>
             </div>
+
         </div>
     </div>
 </div>
+<!--end::Add Insurer Modal-->
 
 <script>
     function togglePassword() {
@@ -189,4 +438,5 @@
         }
     }
 </script>
+
 @endsection

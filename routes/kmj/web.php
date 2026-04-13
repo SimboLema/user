@@ -270,21 +270,14 @@ Route::prefix('insuarer')->name('insuarer.')->group(function () {
 
     Route::get('quotations', [InsuarerQuotationController::class, 'index'])->name('quotations');
     // Insurer quotation routes
-    Route::get('/insuarer/quotations', [InsuarerQuotationController::class, 'index'])->name('quotation.index');
+    Route::get('/insuarer/quotations',       [InsuarerQuotationController::class, 'index'])->name('quotation.index');
+    Route::get('/insuarer/quotations/{id}',  [InsuarerQuotationController::class, 'show'])->name('quotation.show');
 
-    Route::get('/insuarer/quotations/{id}', [InsuarerQuotationController::class, 'show'])->name('quotation.show');
-
-    Route::put('/insuarer/quotations/{id}/status', [InsuarerQuotationController::class, 'updateStatus'])->name('quotation.updateStatus');
-    //Insuarer akubali covernote
-    Route::put('/insuarer/quotation/{id}/status', [InsuarerQuotationController::class, 'updateStatus'])->name('quotation.updateStatus');
+    // Approve / Reject actions (NEW - required routes)
+    Route::post('/quotations/{id}/approve',  [InsuarerQuotationController::class, 'approve'])->name('quotation.updateStatusApprove');
+    Route::post('/quotations/{id}/reject',   [InsuarerQuotationController::class, 'reject'])->name('quotation.updateStatusReject');
     // Cover Notes
-    Route::get('covernotes', [DashboardController::class, 'covernotes'])->name('covernotes');
-
-    // Renewals
-    Route::get('renewals', [DashboardController::class, 'renewals'])->name('renewals');
-
-    // Reports
-    Route::get('reports', [DashboardController::class, 'reports'])->name('reports');
+    
 
 });
 

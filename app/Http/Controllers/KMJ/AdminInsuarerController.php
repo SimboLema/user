@@ -27,6 +27,7 @@ class AdminInsuarerController extends Controller
             'name' => 'required|string|max:255',
             'email'=>'required|email|unique:insuarers,email',
             'password' => 'required|string|min:6',
+            'phone' => 'required|string',
             'company_code' => 'required|string|unique:insuarers,Company_code',
             'insuarer_code' => 'required|string|unique:insuarers,Insuarer_code',
 
@@ -36,6 +37,7 @@ class AdminInsuarerController extends Controller
             'name' =>$request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'phone' =>$request->phone,
             'Company_code' => $request->company_code,
             'Insuarer_code' => $request->insuarer_code,
         ]);
