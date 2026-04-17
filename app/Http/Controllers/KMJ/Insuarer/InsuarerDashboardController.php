@@ -10,9 +10,16 @@ use App\Models\Models\KMJ\Quotation;
 class InsuarerDashboardController extends Controller
 {
     public function index(){
+        $insuarerId = Auth::guard('insuarer')->id();
+
        $quotations = Quotation::where('insuarer_id', Auth::guard('insuarer')->id())->count();
 
-        return view('insuarer.dashboard', compact('quotations'));
+       $baseQuery = Quotation::where('insuarer_id', $insuarerId);
+       $approvedQuotations = (clone $baseQuery)
+        ->where('status', 'approved')
+        ->count();
+
+        return view('insuarer.dashboard', compact('quotations','approvedQuotations'));
     }
 
     public function support(){

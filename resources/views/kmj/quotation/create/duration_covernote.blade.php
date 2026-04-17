@@ -59,9 +59,11 @@
             <label class="form-label">Currency Code</label>
             <select class="form-select" name="currency_id" id="currency_id" required>
                 <option value="">Select Currency Code</option>
+
                 @foreach ($currencies as $currency)
                     <option
                         value="{{ $currency->id }}">{{ $currency->name }}</option>
+                        <option>United States Dollar</option>
                 @endforeach
             </select>
         </div>

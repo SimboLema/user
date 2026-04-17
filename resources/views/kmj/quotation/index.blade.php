@@ -137,7 +137,7 @@
                                     <!--begin::Table head-->
                                     <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
                                         <tr>
-                                            <th>sno</th>
+                                            <th>#</th>
                                             <th>Client</th>
                                             <th>Type</th>
                                             {{-- <th>CoverNoteRef</th> --}}
@@ -182,7 +182,7 @@
                                                         <span
                                                             class="badge border border-warning text-success d-inline-block text-center"
                                                             style="width: auto; color: orange !important;">
-                                                            Awaiting receipt
+                                                            Awaiting approval
                                                         </span>
                                                     @elseif($quotation->status === 'success')
                                                         <span

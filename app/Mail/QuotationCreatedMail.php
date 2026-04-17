@@ -3,29 +3,55 @@
 namespace App\Mail;
 
 use App\Models\Models\KMJ\Quotation;
-use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
+use Mailtrap\MailtrapClient;
+use Mailtrap\Mime\MailtrapEmail;
+use Symfony\Component\Mime\Address;
 
-class QuotationCreatedMail extends Mailable
+class QuotationCreatedMail
 {
-    use Queueable, SerializesModels;
+    protected Quotation $quotation;
 
-    public function __construct(public Quotation $quotation) {}
-
-    public function envelope(): Envelope
+    public function __construct(Quotation $quotation)
     {
-        return new Envelope(
-            subject: 'New Quotation Awaiting Your Approval — ' . $this->quotation->customer->name,
-        );
+        $this->quotation = $quotation;
     }
 
-    public function content(): Content
+    public function send(string $toEmail, string $toName = ''): array
     {
-        return new Content(
-            view: 'emails.quotation.created',
-        );
+        $quotation = $this->quotation;
+        $customer  = $quotation->customer;
+        $coverage  = $quotation->coverage;
+
+        $bodyText = "
+            Dear {$toName},
+
+            A new quotation has been created. Here are the details:
+
+            - Quotation ID   : {$quotation->id}
+            - Customer       : {$customer->name}
+            - Coverage       : {$coverage->name}
+            - Sum Insured    : {$quotation->sum_insured}
+            - Premium (incl. tax): {$quotation->total_premium_including_tax}
+            - Start Date     : {$quotation->cover_note_start_date}
+            - End Date       : {$quotation->cover_note_end_date}
+
+            Please log in to the system to review and process this quotation.
+
+            Regards,
+            The Insurance Team
+                    ";
+
+        $email = (new MailtrapEmail())
+            ->from(new Address('no-reply@suretech.co.tz', 'Insurance System'))
+            ->to(new Address($toEmail, $toName))
+            ->subject('New Quotation Created - #' . $quotation->id)
+            ->category('Quotation')
+            ->text($bodyText);
+
+        $response = MailtrapClient::initSendingEmails(
+            apiKey: config('services.mailtrap.api_key')
+        )->send($email);
+
+        return \Mailtrap\Helper\ResponseHelper::toArray($response);
     }
 }

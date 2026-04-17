@@ -20,7 +20,14 @@
         </div>
         <div class="col-md-6">
             <label class="form-label">Premium Rate</label>
-            <input class="form-control" name="premium_rate" type="number" step="0.01" disabled>
+            <input
+                class="form-control"
+                name="premium_rate"
+                id="premium_rate"
+                type="text"
+                value="0.00%"
+                disabled
+            >
         </div>
         <div class="col-md-6">
             <label class="form-label">Tax Rate </label>
@@ -66,3 +73,15 @@
         </button>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // get rate from backend (safe fallback)
+        let rate = {{ ($coverage->rate ?? 0) / 100 }};
+
+        // show as percentage
+        document.getElementById('premium_rate').value =
+            (rate * 100).toFixed(2) + '%';
+
+    });
+    </script>

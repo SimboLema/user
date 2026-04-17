@@ -17,7 +17,7 @@ class SendTiraController extends Controller
     private string $baseUrl;
     public function __construct()
     {
-        $this->baseUrl = 'https://api.tira.go.tz:8091';
+        $this->baseUrl = 'http://192.168.168.200:80';
     }
 
 
@@ -170,7 +170,7 @@ class SendTiraController extends Controller
                     Log::channel('tiramisxml')->info($gen_data);
 
                     $res = TiraRequest($this->baseUrl . '/ecovernote/api/covernote/non-life/motor/v2/request', $gen_data);
-                   
+
                     $xmlString = is_array($res) ? ($res['response'] ?? '') : $res;
 
                     if (empty($xmlString)) {

@@ -11,7 +11,7 @@
 
          <!--begin::Logo-->
          <div class="d-flex align-items-center flex-grow-1 flex-lg-grow-0 me-lg-15">
-             <a href="{{ route('kmj.index') }}">
+             <a href="#">
                  <img alt="Logo" src="{{ asset('assets/dash/board_files/logo.png') }}"
                      class="h-150px h-lg-150px app-sidebar-logo-default theme-light-show" />
          </div>

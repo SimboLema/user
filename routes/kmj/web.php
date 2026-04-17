@@ -35,21 +35,7 @@ use Illuminate\Support\Facades\Mail;
 
 
 
-Route::get('/test-mail', function () {
-    $quotation = Quotation::with(['customer', 'coverage.product', 'insuarer'])->first();
 
-    if (!$quotation) {
-        return 'No quotation found in database.';
-    }
-
-    if (!$quotation->insuarer || !$quotation->insuarer->email) {
-        return 'Insurer has no email. Insurer: ' . json_encode($quotation->insuarer);
-    }
-
-    Mail::to($quotation->insuarer->email)->send(new QuotationCreatedMail($quotation));
-
-    return 'Email sent to: ' . $quotation->insuarer->email;
-});
 
 Route::middleware(['auth'])->group(function () {
 
@@ -273,11 +259,16 @@ Route::prefix('insuarer')->name('insuarer.')->group(function () {
     Route::get('/insuarer/quotations',       [InsuarerQuotationController::class, 'index'])->name('quotation.index');
     Route::get('/insuarer/quotations/{id}',  [InsuarerQuotationController::class, 'show'])->name('quotation.show');
 
+    //Routes za insuarer kuview na kuset auto approve za sum insured
+    Route::get('/insurer/agreements', [InsuarerQuotationController::class, 'editAgreement'])->name('agreements.show');
+    Route::post('/insurer/agreements', [InsuarerQuotationController::class, 'update'])->name('settings.update');
+
+
     // Approve / Reject actions (NEW - required routes)
-    Route::post('/quotations/{id}/approve',  [InsuarerQuotationController::class, 'approve'])->name('quotation.updateStatusApprove');
-    Route::post('/quotations/{id}/reject',   [InsuarerQuotationController::class, 'reject'])->name('quotation.updateStatusReject');
+    Route::post('/quotations/{id}/approve',  [InsuarerQuotationController::class, 'updateStatus'])->name('quotation.updateStatusApprove');
+    Route::post('/quotations/{id}/reject',   [InsuarerQuotationController::class, 'updateStatus'])->name('quotation.updateStatusReject');
     // Cover Notes
-    
+
 
 });
 

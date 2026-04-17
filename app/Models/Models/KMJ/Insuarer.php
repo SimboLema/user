@@ -16,6 +16,7 @@ class Insuarer extends Authenticatable
         'phone',
         'Company_code',
         'Insuarer_code',
+        'auto_approval_limit',
     ];
 
     protected $hidden = [

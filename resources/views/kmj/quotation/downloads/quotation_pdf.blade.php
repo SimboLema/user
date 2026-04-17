@@ -1,393 +1,633 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motor Policy Schedule - Page 2</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        /*
-         * GLOBAL STYLING
-         */
-        @page {
-            size: A4;
-            margin: 10mm;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 10px;
-            color: #000;
+        * {
             margin: 0;
             padding: 0;
-        }
-
-        .container {
-            width: 100%;
-            border: 1px solid #000;
-            padding: 10px 15px;
             box-sizing: border-box;
         }
 
-        /*
-         * HEADER (Mini Details Bar)
-         */
-        .mini-header-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
+        body {
+            font-family: DejaVu Sans, sans-serif;
             font-size: 10px;
-            table-layout: fixed; /* Muhimu kwa upana wa seli */
+            color: #1a1a1a;
+            background: #fff;
         }
 
-        .mini-header-table td {
-            border: 1px solid #000;
-            padding: 5px 6px;
+        /* ── PAGE WRAPPER ── */
+        .page {
+            width: 100%;
+            position: relative;
+        }
+
+        /* ── PAGE BREAK ── */
+        .page-break {
+            break-after: page;
+            page-break-after: always;
+            height: 0;
+            display: block;
+        }
+
+        /* ── HEADER / FOOTER IMAGES ── */
+        .page-header-img {
+            width: 100%;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .page-footer-img {
+            width: 100%;
+            display: block;
+            margin-top: 6px;
+        }
+
+        /* ── CONTENT WRAPPER ── */
+        .content {
+            padding: 0 20px;
+        }
+
+        /* ── PREVENT KEY BLOCKS FROM SPLITTING ── */
+        .quotation-header-table,
+        .info-table,
+        .fin-table,
+        .bank-split-table,
+        .issued-by-table,
+        .declaration-block,
+        .bank-details-placeholder,
+        .section-with-bar {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        /* ── QUOTATION HEADER TABLE ── */
+        .quotation-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 8px;
+        }
+        .quotation-header-table td {
+            border: 1px solid #1a3a5c;
+            padding: 5px 8px;
             vertical-align: middle;
-            text-align: left;
-            background-color: #f2f2f2;
-            height: 15px;
         }
-
-        .mini-header-table .label {
+        .quotation-header-table .label-cell {
+            background: #1a3a5c;
+            color: #fff;
             font-weight: bold;
-            margin-right: 5px;
+            font-size: 18px;
+            width: 160px;
+            letter-spacing: 1px;
         }
-
-        .col-25 { width: 25%; }
-
-        /*
-         * MAIN SCHEDULE TABLE
-         */
-        .schedule-title {
-            background-color: #f2f2f2;
+        .quotation-header-table .col-header {
+            background: #1a3a5c;
+            color: #fff;
             font-weight: bold;
             text-align: center;
-            border: 1px solid #000;
-            padding: 5px;
-            margin-bottom: 0;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+        .quotation-header-table .col-value {
+            text-align: center;
             font-size: 10px;
+            font-weight: bold;
         }
 
-        .schedule-table {
+        /* ── INFO TABLE ── */
+        .info-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
-            margin-top: -1px;
-            margin-bottom: 10px;
-            table-layout: fixed; /* Muhimu */
-        }
-
-        .schedule-table th,
-        .schedule-table td {
-            border: 1px solid #000;
-            padding: 5px;
-            vertical-align: top;
-            height: 15px;
-        }
-
-        .schedule-table th {
-            text-align: center;
-            background-color: #d9e1f2;
-            font-weight: bold;
-        }
-
-        /* Upana wa Schedule I */
-        .schedule-table.schedule-i-table .item-col { width: 5%; text-align: center; font-weight: bold;}
-        .schedule-table.schedule-i-table .cover-col { width: 35%; text-align: left;}
-        .schedule-table.schedule-i-table .motor-col { width: 20%; text-align: right;}
-        .schedule-table.schedule-i-table .commercial-col { width: 20%; text-align: right;}
-        .schedule-table.schedule-i-table .cycle-col { width: 20%; text-align: right;}
-
-        /* Upana wa Schedule II A */
-        .schedule-table.schedule-iia-table .item-col { width: 5%; text-align: center; font-weight: bold;}
-        .schedule-table.schedule-iia-table .cover-col { width: 40%; text-align: left;}
-        .schedule-table.schedule-iia-table .motor-private-col { width: 30%; text-align: center;}
-        .schedule-table.schedule-iia-table .motor-cycle-col { width: 25%; text-align: center;}
-
-
-        .bold { font-weight: bold; }
-        .center { text-align: center; }
-        .right { text-align: right; }
-        .bg-lightgrey { background-color: #f2f2f2; }
-
-
-        /*
-         * SCHEDULE B TABLE (Deductibles) - CRITICAL ADJUSTMENTS
-         */
-        .schedule-b-table {
-            table-layout: fixed; /* Muhimu */
             margin-bottom: 5px;
         }
-
-        .schedule-b-table th {
-            text-align: center;
-            font-size: 9px;
-            height: 35px;
-            padding: 3px;
-        }
-
-        .schedule-b-table td {
-            font-size: 9px;
-            padding: 4px;
+        .info-table td {
+            border: 1px solid #555;
+            padding: 4px 8px;
             vertical-align: top;
         }
-
-        /* Upana wa Schedule II B */
-        .schedule-b-table .item-col { width: 5%; }
-        .schedule-b-table .category-col { width: 18%; }
-        .schedule-b-table .cargo-col { width: 27%; }
-        .schedule-b-table .passenger-row-2 { width: 15%; } /* Nusu ya 30% */
-        .schedule-b-table .special-col { width: 25%; }
-
-        .schedule-b-table .data-align-left { text-align: left; }
-        .schedule-b-table .data-align-right { text-align: right; }
-
-
-        /*
-         * FOOTER INFO
-         */
-        .footer-disclaimer {
-            font-size: 9px;
-            margin: 10px 0;
-            line-height: 1.4;
+        .field-label {
+            background: #e8e8e8;
+            font-weight: bold;
+            font-size: 9.5px;
+            color: #222;
+            white-space: nowrap;
+        }
+        .field-value {
+            font-size: 10px;
+            color: #111;
         }
 
-        .powered-by-grid {
-            border-top: 1px solid #000;
-            padding-top: 2px;
+        /* ── SECTION HEADING BAR ── */
+        .section-bar {
+            background: #1a3a5c;
+            color: #fff;
+            font-weight: bold;
+            font-size: 9.5px;
+            border: 1px solid #1a3a5c;
+            padding: 5px 8px;
+            page-break-after: avoid;
+            break-after: avoid;
+        }
+
+        /* ── QUOTATION DETAILS — line-item style ── */
+
+        /* Column sub-header (Description / Sum Insured / Premium) */
+        .detail-col-header {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .detail-col-header td {
+            background: #e8e8e8;
+            border: 1px solid #bbb;
+            border-top: none;
+            padding: 3px 8px;
+            font-weight: bold;
+            font-size: 8.5px;
+            text-transform: uppercase;
+            color: #555;
+        }
+
+        /* Each detail row rendered like the screenshot */
+        .detail-line {
+            width: 100%;
+            border-collapse: collapse;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px dotted #ccc;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .detail-line td {
+            padding: 5px 8px;
+            vertical-align: top;
+            font-size: 9.5px;
+        }
+        /* Alternating row shading */
+        .detail-line.even td {
+            background: #f7f7f7;
+        }
+        /* Bold label (left, 65%) */
+        .dl-label {
+            width: 65%;
+            font-weight: bold;
+            color: #1a1a1a;
+        }
+        /* Value (right, 35%) */
+        .dl-value {
+            width: 35%;
+            text-align: right;
+            white-space: nowrap;
+            color: #111;
+        }
+
+        /* Wrapper gets a solid bottom border after all rows */
+        .detail-lines-wrapper {
+            border-bottom: 1px solid #ccc;
+        }
+
+        /* ── FINANCIALS SUMMARY ── */
+        .fin-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 5px;
-            font-size: 7px;
-            display: table;
+        }
+        .fin-table td {
+            border: 1px solid #555;
+            padding: 5px 10px;
+        }
+        .fin-table .fin-label {
+            text-align: right;
+            font-weight: bold;
+            font-size: 10px;
+            width: 75%;
+        }
+        .fin-table .fin-value {
+            text-align: right;
+            font-size: 10px;
+            white-space: nowrap;
+        }
+        .fin-table .fin-total td {
+            font-weight: bold;
+            font-size: 11px;
+            background: #f0f4f8;
+        }
+
+        /* ── BANK DETAILS PLACEHOLDER ── */
+        .bank-details-placeholder {
+            width: 100%;
+            margin-top: 8px;
+        }
+        .bank-details-placeholder table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .powered-by-cell {
-            display: table-cell;
-            text-align: left;
-            width: 25%;
-            padding: 0 5px;
+        /* ── BANK SPLIT TABLE (Page 2) ── */
+        .bank-split-table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        .pb-center-uin { width: 17%; text-align: center !important; }
-        .pb-center-receipt { width: 17%; text-align: center !important; }
-        .pb-right-issue { width: 33%; text-align: right !important; }
-        .pb-page-no { width: 13%; text-align: right !important; border-left: 1px solid #000; padding-left: 5px;}
+
+        /* ── BANK BLOCK ── */
+        .bank-block {
+            margin-bottom: 6px;
+            font-size: 9.5px;
+            line-height: 1.6;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .bank-block strong { font-size: 9.5px; }
+
+        /* ── FOOTER TEXT ── */
+        .footer {
+            margin: 6px 20px 0 20px;
+            font-size: 8px;
+            color: #888;
+            border-top: 1px solid #ddd;
+            padding-top: 4px;
+        }
+        .footer-inner { width: 100%; border-collapse: collapse; }
+        .footer-inner td { font-size: 8px; color: #888; }
+
+        /* ── SURETECH LOGO ── */
+        .suretech-logo {
+            padding: 4px 20px 0 20px;
+            font-size: 9px;
+            color: #1a3a5c;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .suretech-logo span.sys {
+            font-weight: normal;
+            font-size: 7.5px;
+            letter-spacing: 2px;
+            display: block;
+            color: #888;
+        }
+
+        /* ── DECLARATION BLOCK ── */
+        .declaration-block {
+            border: 1px solid #555;
+            border-top: none;
+            padding: 12px 10px 80px 10px;
+            font-size: 9.5px;
+            line-height: 1.9;
+        }
     </style>
 </head>
-
 <body>
 
-    <div class="container">
+{{-- ============================================================ --}}
+{{-- PAGE 1 — QUOTATION DETAILS                                   --}}
+{{-- ============================================================ --}}
+<div class="page">
 
-        <table class="mini-header-table">
+    <img class="page-header-img" src="{{ public_path('img/header.jpeg') }}" alt="Header" />
+
+    <div class="content">
+
+        {{-- ── Quotation Header ── --}}
+        <table class="quotation-header-table">
             <tr>
-                <td class="col-25"><span class="label">Risk Note No.</span> 14474</td>
-                <td class="col-25"><span class="label">Sticker No.</span> 25002-20945-36811</td>
-                <td class="col-25"><span class="label">Insured Name</span> HAMDU SAID MSAMI</td>
-                <td class="col-25"><span class="label">Issuing Intermediary Name</span> KMJ Insurance Brokers Ltd</td>
+                <td class="label-cell" rowspan="2">QUOTATION</td>
+                <td class="col-header">Quotation Number:</td>
+                <td class="col-header">Control Number:</td>
+                <td class="col-header">Issue Date</td>
+            </tr>
+            <tr>
+                <td class="col-value">{{ $quotation->id }}</td>
+                <td class="col-value">{{ $quotation->control_number ?? '—' }}</td>
+                <td class="col-value">{{ $quotation->created_at->format('d-M-Y') }}</td>
             </tr>
         </table>
 
-        <p class="schedule-title bold" style="background-color: #d9e1f2;">LIMIT OF LIABILITY ATTACHING TO AND FORMING PART OF MOTOR VEHICLE INSURANCE POLICY</p>
-
-        <table class="schedule-table schedule-i-table">
+        {{-- ── Client / Policy Summary ── --}}
+        <table class="info-table" style="margin-bottom:4px;">
             <tr>
-                <th class="item-col">Item</th>
-                <th class="cover-col">Scope of Cover/Limit of Liability</th>
-                <th class="motor-col">Motor Private</th>
-                <th class="commercial-col">Motor Commercial</th>
-                <th class="cycle-col">Motor Cycle</th>
+                <td class="field-label" style="width:130px;">Client Name</td>
+                <td class="field-value" colspan="3">
+                    <strong>{{ $quotation->customer->name ?? '—' }}</strong>
+                </td>
             </tr>
             <tr>
-                <td class="item-col">1.0</td>
-                <td class="cover-col">Third party Injury/Death</td>
-                <td class="motor-col right">Unlimited</td>
-                <td class="commercial-col right">Unlimited</td>
-                <td class="cycle-col right">Unlimited</td>
+                <td class="field-label">Address</td>
+                <td class="field-value">
+                    {{ $quotation->customer->address ?? 'P.O.BOX — DAR ES SALAAM' }}<br>
+                    TIN: {{ $quotation->customer->tin ?? '—' }}
+                </td>
+                <td class="field-label" style="width:100px;">Contacts</td>
+                <td class="field-value">
+                    Mobile: {{ $quotation->customer->phone ?? '—' }}
+                </td>
             </tr>
             <tr>
-                <td class="item-col">2.0</td>
-                <td class="cover-col">Third Party Property Damage</td>
-                <td class="motor-col right">100,000,000</td>
-                <td class="commercial-col right">100,000,000</td>
-                <td class="cycle-col right">50,000,000</td>
+                <td class="field-label">Intermediary Name</td>
+                <td class="field-value">KMJ Insurance Brokers Ltd</td>
+                <td class="field-label">Cover Period</td>
+                <td class="field-value">
+                    {{ optional($quotation->cover_note_start_date)->format('d-M-Y') ?? '—' }}
+                    &nbsp;–&nbsp;
+                    {{ optional($quotation->cover_note_end_date)->format('d-M-Y') ?? '—' }}
+                </td>
             </tr>
             <tr>
-                <td class="item-col">3.0</td>
-                <td class="cover-col">Passenger Liability Per Person</td>
-                <td class="motor-col right">30,000,000</td>
-                <td class="commercial-col right">30,000,000</td>
-                <td class="cycle-col right">20,000,000</td>
+                <td class="field-label">Insurance Company</td>
+                <td class="field-value" colspan="3">{{ $quotation->insuarer->name ?? '—' }}</td>
             </tr>
             <tr>
-                <td class="item-col"></td>
-                <td class="cover-col">Passenger Liability Per Occurrence</td>
-                <td class="motor-col right">100,000,000</td>
-                <td class="commercial-col right">100,000,000</td>
-                <td class="cycle-col right">N/A</td>
+                <td class="field-label">Insurance Type</td>
+                <td class="field-value" colspan="3">
+                    <strong>{{ strtoupper($quotation->coverage->product->name ?? 'PACKAGE POLICY') }}</strong>
+                </td>
             </tr>
             <tr>
-                <td class="item-col">4.0</td>
-                <td class="cover-col">Medical Expenses Per Person</td>
-                <td class="motor-col right">2,500,000</td>
-                <td class="commercial-col right">N/A</td>
-                <td class="cycle-col right">250,000</td>
-            </tr>
-            <tr>
-                <td class="item-col">5.0</td>
-                <td class="cover-col">Personal Accident Benefit</td>
-                <td class="motor-col right" style="font-size: 9px;">2,000,000 (any one accident)</td>
-                <td class="commercial-col right">N/A</td>
-                <td class="cycle-col right">N/A</td>
-            </tr>
-            <tr>
-                <td class="item-col">6.0</td>
-                <td class="cover-col">Windscreen Cover</td>
-                <td class="motor-col right" style="font-size: 9px;">500,000 (unless stated otherwise)</td>
-                <td class="commercial-col right" style="font-size: 9px;">1,000,000 (unless stated otherwise)</td>
-                <td class="cycle-col right">N/A</td>
-            </tr>
-            <tr>
-                <td class="item-col">7.0 (i)</td>
-                <td class="cover-col">Towing Charges within DSM</td>
-                <td class="motor-col right">500,000</td>
-                <td class="commercial-col right">500,000</td>
-                <td class="cycle-col right">100,000</td>
-            </tr>
-            <tr>
-                <td class="item-col">(ii)</td>
-                <td class="cover-col">Towing charges outside Dsm</td>
-                <td class="motor-col right">1,000,000</td>
-                <td class="commercial-col right">1,500,000</td>
-                <td class="cycle-col right">N/A</td>
-            </tr>
-            <tr>
-                <td class="item-col">8.0</td>
-                <td class="cover-col">Riots/Strikes (nonpolitical)</td>
-                <td class="motor-col right">Included</td>
-                <td class="commercial-col right">Included</td>
-                <td class="cycle-col right">Included</td>
-            </tr>
-            <tr>
-                <td class="item-col">9.0</td>
-                <td class="cover-col">Geographical Limit</td>
-                <td class="motor-col center" style="font-size: 9px;">East Africa (unless stated otherwise)</td>
-                <td class="commercial-col center" style="font-size: 9px;">East Africa (unless stated otherwise)</td>
-                <td class="cycle-col center">East Africa</td>
+                <td class="field-label">Coverage / Risk</td>
+                <td class="field-value" colspan="3">{{ $quotation->coverage->risk_name ?? '—' }}</td>
             </tr>
         </table>
 
-        <p class="schedule-title bold" style="background-color: #d9e1f2;">SCHEDULE II: DEDUCTIBLES APPLICABLE (Unless stated otherwise in schedule)</p>
-
-        <p class="schedule-title bold bg-lightgrey" style="font-size: 10px; margin-top: -1px;">A: APPLICABLE TO MOTOR PRIVATE CAR AND MOTOR CYCLES</p>
-        <table class="schedule-table schedule-iia-table">
+        {{-- ── Covering Details + Description of Risk ── --}}
+        <table class="info-table" style="margin-bottom:5px;">
             <tr>
-                <th class="item-col">Item</th>
-                <th class="cover-col">Scope of cover/Limit of Liability</th>
-                <th class="motor-private-col">Motor Private</th>
-                <th class="motor-cycle-col">Motor Cycle</th>
+                <td class="section-bar" style="width:50%;">Covering Details</td>
+                <td class="section-bar" style="width:50%;">Description of Risk</td>
             </tr>
             <tr>
-                <td class="item-col">10.1</td>
-                <td class="cover-col">Own damage - Within Tanzania</td>
-                <td class="motor-private-col center" style="font-size: 9px;">5% of claim min. 350,000 (double the excess in case of total theft claim)</td>
-                <td class="motor-cycle-col center" style="font-size: 9px;">5% of claim min. 100,000 (double the excess in case of total theft claim)</td>
-            </tr>
-            <tr>
-                <td class="item-col"></td>
-                <td class="cover-col">Own damage - Outside Tanzania</td>
-                <td class="motor-private-col center">Twice of Item 10.1 above</td>
-                <td class="motor-cycle-col center">Twice of Item 10.1 above</td>
-            </tr>
-            <tr>
-                <td class="item-col">10.2</td>
-                <td class="cover-col">Young and Inexperienced Driver</td>
-                <td class="motor-private-col center">5% of claim min. 500,000</td>
-                <td class="motor-cycle-col center">5% of claim min. 250,000</td>
-            </tr>
-            <tr>
-                <td class="item-col">10.3</td>
-                <td class="cover-col">Third Party Property Damage</td>
-                <td class="motor-private-col center">250,000</td>
-                <td class="motor-cycle-col center">50,000</td>
+                <td class="field-value" style="font-style:italic; font-size:9px; color:#444; line-height:1.6; padding:6px 8px;">
+                    ON PACKAGE POLICY TO COVER BELOW MENTIONED RISKS<br>
+                    OFFICE LOCATION: {{ strtoupper($quotation->office_location ?? '15TH FLOOR - PSSSF TOWER') }}<br>
+                    {{ strtoupper($quotation->office_address ?? 'GARDEN AVENUE / OHIO STREET') }}<br>
+                    {{ strtoupper($quotation->office_city ?? 'DAR ES SALAAM, TANZANIA') }}
+                </td>
+                <td style="border:1px solid #555; padding:6px 8px; vertical-align:top;"></td>
             </tr>
         </table>
 
-        <p class="schedule-title bold bg-lightgrey" style="font-size: 10px; margin-top: -1px;">B: APPLICABLE TO MOTOR COMMERCIAL VEHICLE</p>
-        <table class="schedule-table schedule-b-table">
-            <tr>
-                <th rowspan="2" class="item-col">Item</th>
-                <th rowspan="2" class="category-col">Scope of cover/Limit of Liability</th>
-                <th class="cargo-col">General Goods Carrying</th>
-                <th colspan="2" class="passenger-col">Passenger Carrying Vehicles</th>
-                <th rowspan="2" class="special-col">Special Type Vehicle</th>
-            </tr>
-            <tr>
-                <th class="cargo-col" style="font-weight: normal; font-size: 8px;">Trucks, Tractors, Pickups, canters etc</th>
-                <th class="passenger-row-2" style="font-weight: normal; font-size: 8px;">Public tax, private hire, tour operators</th>
-                <th class="passenger-row-2" style="font-weight: normal; font-size: 8px;">Buses (Daladala within city, upcountry, private & school)</th>
-            </tr>
-            <tr>
-                <td class="item-col center">10.1</td>
-                <td class="category-col bold data-align-left">Own Damage - Within Tanzania</td>
-                <td class="cargo-col data-align-left">7.5% of claim min. 500,000 (30% of claim, minimum 750,000 in case of total theft claim) 5% of sum insured for Tankers</td>
-                <td class="passenger-row-2 data-align-left">7.5% of claim min. 500,000 (10% of claim, minimum 750,000 in case of total theft claim</td>
-                <td class="passenger-row-2 data-align-left">10% of claim min. 1,000,000 (10% of claim, minimum 750,000 in case of total theft claim</td>
-                <td class="special-col data-align-left">10% of claim min. 1,000,000</td>
-            </tr>
-            <tr>
-                <td class="item-col center"></td>
-                <td class="category-col bold data-align-left">Own Damage - Outside Tanzania</td>
-                <td class="cargo-col data-align-left">Twice of Item 10.1 above</td>
-                <td class="passenger-row-2 data-align-left">Twice of Item 10.1 above</td>
-                <td class="passenger-row-2 data-align-left">Twice of Item 10.1 above</td>
-                <td class="special-col data-align-left">Twice of Item 10.1 above</td>
-            </tr>
-            <tr>
-                <td class="item-col center">10.2</td>
-                <td class="category-col bold data-align-left">Young and Inexperienced Driver</td>
-                <td class="cargo-col data-align-left">10% of claim min. 750,000</td>
-                <td class="passenger-row-2 data-align-left">10% of claim min. 750,000</td>
-                <td class="passenger-row-2 data-align-left">10% of claim min. 1,000,000</td>
-                <td class="special-col data-align-left">10% of claim min. 1,000,000</td>
-            </tr>
-            <tr>
-                <td class="item-col center">10.3</td>
-                <td class="category-col bold data-align-left">Third Party Property Damage</td>
-                <td class="cargo-col data-align-left">500,000</td>
-                <td class="passenger-row-2 data-align-left">500,000</td>
-                <td class="passenger-row-2 data-align-left">500,000</td>
-                <td class="special-col data-align-left">500,000</td>
-            </tr>
-        </table>
+        {{-- ══════════════════════════════════════════════════════════ --}}
+        {{-- QUOTATION DETAILS — line-item style matching the screenshot --}}
+        {{-- ══════════════════════════════════════════════════════════ --}}
+        <div class="section-with-bar">
+            <div class="section-bar">Quotation Details</div>
 
-        <div class="footer-disclaimer">
-            <p><span class="bold">Damage:</span> Item No 4 to 8 and 10.1 do not apply in case of Third-Party Cover</p>
-            <p>Windscreen cover if stated in the schedule is subjected to deductibles /excess of Tshs. 50,000 for each and every loss</p>
-            <p>TP cover is restricted to United Republic of Tanzania</p>
-            <p><span class="bold">East Africa means,</span> Tanzania, Kenya, Uganda, Rwanda, South Sudan and Burundi</p>
-        </div>
+            {{-- Sub-column headers --}}
+            <table class="detail-col-header">
+                <tr>
+                    <td style="width:65%;">Description</td>
+                    <td style="width:35%; text-align:right;">Value</td>
+                </tr>
+            </table>
 
-        <div class="powered-by-grid" style="font-size: 8px;">
-            <div class="powered-by-cell" style="width: 33.33%; text-align: left;">
-                Powered from Smart Policy Insurance System
-            </div>
-            <div class="powered-by-cell" style="width: 16.67%; text-align: center;">
-                UIN #: KMJI14474
-            </div>
-            <div class="powered-by-cell" style="width: 16.67%; text-align: center;">
-                Receipt No: 162730
-            </div>
-            <div class="powered-by-cell" style="width: 20%; text-align: right;">
-                 JJ Issue three-28-Jul-2025 11:58:02 AM
-            </div>
-            <div class="powered-by-cell" style="width: 13.33%; text-align: right; border-left: 1px solid #000; padding-left: 5px;">
-                Page 2 of 2
+            {{-- Line items from $quotationDetails (built in controller) --}}
+            @php
+
+                $finKeys = [
+                    'Total Premium (Excl. Tax)',
+                    'Total Premium (Incl. Tax)',
+                    'Tax Amount',
+                ];
+                $rowIndex = 0;
+            @endphp
+
+            <div class="detail-lines-wrapper">
+                @foreach($quotationDetails as $label => $value)
+                    @if(!in_array($label, $finKeys) && $value !== null && $value !== '' && $value !== '0.00')
+                        @php $rowClass = ($rowIndex % 2 === 0) ? '' : 'even'; $rowIndex++; @endphp
+                        <table class="detail-line {{ $rowClass }}">
+                            <tr>
+                                <td class="dl-label">{{ $label }}</td>
+                                <td class="dl-value">{{ $value }}</td>
+                            </tr>
+                        </table>
+                    @endif
+                @endforeach
             </div>
         </div>
+        {{-- ══════════════════════════════════════════════════════════ --}}
+
+        {{-- ── Financial Summary ── --}}
+        <table class="fin-table">
+            <tr>
+                <td class="fin-label">Discount</td>
+                <td class="fin-value">{{ number_format($quotation->discount ?? 0, 2) }}</td>
+            </tr>
+            <tr>
+                <td class="fin-label">Total Premium (Excl. Tax)</td>
+                <td class="fin-value">{{ number_format($quotation->total_premium_excluding_tax ?? 0, 2) }}</td>
+            </tr>
+            <tr>
+                <td class="fin-label">VAT / Tax Amount</td>
+                <td class="fin-value">{{ number_format($quotation->tax_amount ?? 0, 2) }}</td>
+            </tr>
+            <tr class="fin-total">
+                <td class="fin-label">Total Receivable (Incl. Tax)</td>
+                <td class="fin-value">{{ number_format($quotation->total_premium_including_tax ?? 0, 2) }}</td>
+            </tr>
+        </table>
+
+
+    </div>{{-- end .content --}}
+
+    
+
+    <img class="page-footer-img" src="{{ public_path('img/footer.jpeg') }}" alt="Footer" />
+
+</div>
+
+<div class="page-break"></div>
+
+{{-- ============================================================ --}}
+{{-- PAGE 2 — BANK DETAILS                                        --}}
+{{-- ============================================================ --}}
+<div class="page">
+
+    <img class="page-header-img" src="{{ public_path('img/header.jpeg') }}" alt="Header" />
+
+    <div class="content">
+
+        <table class="quotation-header-table" style="margin-bottom:10px;">
+            <tr>
+                <td class="label-cell" rowspan="2">QUOTATION</td>
+                <td class="col-header">Quotation Number:</td>
+                <td class="col-header">Control Number:</td>
+                <td class="col-header">Issue Date</td>
+            </tr>
+            <tr>
+                <td class="col-value">{{ $quotation->id }}</td>
+                <td class="col-value">{{ $quotation->control_number ?? '—' }}</td>
+                <td class="col-value">{{ $quotation->created_at->format('d-M-Y') }}</td>
+            </tr>
+        </table>
+
+        <table class="bank-split-table">
+            <tr>
+                {{-- Left: Bank details --}}
+                <td style="width:50%; padding-right:6px; vertical-align:top; font-size:9.5px; line-height:1.6;">
+
+                    <strong>FOLLOWING ARE OUR BANK DETAILS:</strong><br><br>
+                    <strong>Account Name: {{ $quotation->insuarer->name ?? 'Sanlam General Insurance (Tanzania) Limited' }}</strong><br><br>
+
+                    <div class="bank-block">
+                        <strong>ECO BANK TANZANIA LIMITED</strong><br>
+                        Account Number: USD 0031015400869201 / TZS 0030015400869201<br>
+                        Branch: Msimbazi, DSM &nbsp;|&nbsp; Swift: ECOCTZTZ
+                    </div>
+                    <div class="bank-block">
+                        <strong>MKOMBOZI COMMERCIAL BANK</strong><br>
+                        Account Number: USD 00451511798001 / TZS 00410611798001<br>
+                        Branch: Kariakoo, DSM &nbsp;|&nbsp; Swift: MKCBTZTZ
+                    </div>
+                    <div class="bank-block">
+                        <strong>FIRST NATIONAL BANK</strong><br>
+                        Account Number: USD 62470178445 / TZS 62470177679<br>
+                        Branch: Main, DSM &nbsp;|&nbsp; Swift: FIRNTZTX
+                    </div>
+                    <div class="bank-block">
+                        <strong>NMB BANK</strong><br>
+                        Account Number: USD 20110025007 / TZS 20110007788<br>
+                        Branch: Bank House &nbsp;|&nbsp; Swift: NMIBTZTZ
+                    </div>
+                    <div class="bank-block">
+                        <strong>CRDB BANK PLC</strong><br>
+                        Account Number: USD 0250439350800 / TZS 0150439350800<br>
+                        Branch: Azikiwe &nbsp;|&nbsp; Swift: CORUTZTZ
+                    </div>
+                    <div class="bank-block">
+                        <strong>STANBIC BANK</strong><br>
+                        Account Number: USD 9120000864461 / TZS 9120000619467<br>
+                        Branch: Kariakoo Sokoni &nbsp;|&nbsp; Swift: SBICTZTX
+                    </div>
+                    <div class="bank-block">
+                        <strong>DIAMOND TRUST BANK</strong><br>
+                        Account Number: USD 0400918015 / TZS 0400918023<br>
+                        Branch: Main &nbsp;|&nbsp; Swift: DTKETZTZ
+                    </div>
+                    <div class="bank-block">
+                        <strong>NATIONAL BANK OF COMMERCE</strong><br>
+                        Account Number: USD 011105016883 / TZS 011103037410<br>
+                        Branch: Corporate &nbsp;|&nbsp; Swift: NLCBTZTX
+                    </div>
+                    <div class="bank-block">
+                        <strong>STANDARD CHARTERED BANK</strong><br>
+                        Account Number: TZS 0102021445600<br>
+                        Branch: International House &nbsp;|&nbsp; Swift: SCBLTZTX<br>
+                        <em>Payment should be made in favor of the insurance company.</em>
+                    </div>
+
+                </td>
+
+                {{-- Right: Digital Payment --}}
+                <td style="width:50%; padding-left:6px; vertical-align:top; font-size:9.5px; line-height:1.75;">
+                    <strong>For payment through NMB/CRDB Channels:</strong><br>
+                    Your payment reference # is <strong>{{ $quotation->cover_note_reference ?? 'SPXZ2281725' }}</strong>.
+                    Your broker shall advise you on the payment guidelines.<br><br>
+
+                    <strong>FOR PAYMENT THROUGH SELCOM PAY:</strong><br>
+                    Reference number has not been generated. Kindly click on the
+                    'Digital Payment' button on the quotation screen &amp; select
+                    'Selcom' option to generate a payment reference number.
+                </td>
+            </tr>
+        </table>
+
     </div>
 
-</body>
+    <div class="footer">
+        <table class="footer-inner"><tr>
+            <td><em>Powered from Smart Policy Insurance System</em><br>
+                Printed Date: {{ now()->format('n/j/Y g:i:sA') }} | Printed By: KMJ Insurance</td>
+            <td style="text-align:right;">Page 2 of 3</td>
+        </tr></table>
+    </div>
 
+    <div class="suretech-logo">
+        &#9632; <strong style="color:#1a3a5c; letter-spacing:1px;">SURETECH</strong>
+        <span class="sys">SYSTEMS</span>
+    </div>
+
+    <img class="page-footer-img" src="{{ public_path('img/footer.jpeg') }}" alt="Footer" />
+
+</div>
+
+<div class="page-break"></div>
+
+{{-- ============================================================ --}}
+{{-- PAGE 3 — TERMS & CUSTOMER DECLARATION                        --}}
+{{-- ============================================================ --}}
+<div class="page">
+
+    <img class="page-header-img" src="{{ public_path('img/header.jpeg') }}" alt="Header" />
+
+    <div class="content">
+
+        <table class="quotation-header-table" style="margin-bottom:10px;">
+            <tr>
+                <td class="label-cell" rowspan="2">QUOTATION</td>
+                <td class="col-header">Quotation Number:</td>
+                <td class="col-header">Control Number:</td>
+                <td class="col-header">Issue Date</td>
+            </tr>
+            <tr>
+                <td class="col-value">{{ $quotation->id }}</td>
+                <td class="col-value">{{ $quotation->control_number ?? '—' }}</td>
+                <td class="col-value">{{ $quotation->created_at->format('d-M-Y') }}</td>
+            </tr>
+        </table>
+
+        <table class="issued-by-table" style="width:100%; border-collapse:collapse; margin-bottom:6px;">
+            <tr>
+                <td style="font-size:9px; color:#444; line-height:1.8; vertical-align:top; width:70%;">
+                    1. When referring to this bill please quote the policy number / Cover note number.<br>
+                    2. Cheques should be crossed and made payable to {{ $quotation->insuarer->name ?? 'Sanlam General Insurance (Tanzania) Limited' }}.<br>
+                    3. An official receipt should be obtained upon payment.<br>
+                    4. An insurance policy will become invalid retroactive to the date of inception if the full premium is not paid.
+                </td>
+                <td style="text-align:right; font-weight:bold; font-size:9.5px; vertical-align:top;">
+                    Issued By, KMJ INSURANCE
+                </td>
+            </tr>
+        </table>
+
+        <div style="border-top:1px dashed #999; padding-top:4px; text-align:right; font-size:9px; color:#555; margin-bottom:8px;">
+            For, KMJ Insurance Brokers Ltd
+        </div>
+
+        <div class="section-with-bar">
+            <div class="section-bar">Customer Declaration</div>
+            <div class="declaration-block">
+                <ol style="padding-left:16px; margin:0;">
+                    <li>I/We declare that the above quote is given to me/us on the information provided by me/us.</li>
+                    <li>I/We declare to the best of my/our knowledge and belief that the information given on this quote is true in every respect.</li>
+                    <li>I/We agree that this proposal and declaration shall be the basis of the contract between me/us and the Insurer.</li>
+                    <li>I/We confirm to have been given adequate pre-sale and post-sale advice relating to coverage, terms and conditions of this insurance product.</li>
+                </ol>
+
+                {{-- Watermark --}}
+                <div style="text-align:center; margin-top:30px; opacity:0.08;">
+                    <span style="font-size:80px; font-weight:900; color:#1a3a5c; letter-spacing:-3px; font-style:italic;">
+                        KMJ<span style="color:#c0272d;">ib</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <table class="footer-inner"><tr>
+            <td><em>Powered from Smart Policy Insurance System</em><br>
+                Printed Date: {{ now()->format('n/j/Y g:i:sA') }} | Printed By: KMJ Insurance</td>
+            <td style="text-align:right;">Page 3 of 3</td>
+        </tr></table>
+    </div>
+
+    <div class="suretech-logo">
+        &#9632; <strong style="color:#1a3a5c; letter-spacing:1px;">SURETECH</strong>
+        <span class="sys">SYSTEMS</span>
+    </div>
+
+    <img class="page-footer-img" src="{{ public_path('img/footer.jpeg') }}" alt="Footer" />
+
+</div>
+
+</body>
 </html>

@@ -230,7 +230,7 @@
 
             <!--begin::Premium Calculation Section-->
             <div class="row gx-5 gx-xl-10 mb-10">
-                <div class="col-xl-8 offset-xl-4">
+                <div class="col-xl-12">
                     <div class="card card-flush shadow-sm" style="border-left: 4px solid #003153;">
                         <div class="card-header border-0 pt-7 bg-light">
                             <h3 class="card-title fw-bold" style="color: #003153;">
@@ -241,12 +241,6 @@
                             <div class="table-responsive">
                                 <table class="table table-borderless">
                                     <tbody>
-                                        <tr class="border-bottom">
-                                            <td class="text-gray-600 fw-semibold">Base Premium</td>
-                                            <td class="text-end text-gray-800 fw-bold">
-                                                TZS {{ number_format($quotation->base_premium ?? 0, 2) }}
-                                            </td>
-                                        </tr>
 
                                         @if($quotation->additional_charges > 0)
                                         <tr class="border-bottom">
@@ -266,19 +260,7 @@
                                         </tr>
                                         @endif
 
-                                        <tr class="border-bottom">
-                                            <td class="text-gray-600 fw-semibold">Subtotal (Ex VAT)</td>
-                                            <td class="text-end text-gray-800 fw-bold">
-                                                TZS {{ number_format($quotation->total_premium ?? 0, 2) }}
-                                            </td>
-                                        </tr>
 
-                                        <tr class="border-bottom">
-                                            <td class="text-gray-600 fw-semibold">VAT (18%)</td>
-                                            <td class="text-end text-gray-800 fw-bold">
-                                                TZS {{ number_format($quotation->vat ?? 0, 2) }}
-                                            </td>
-                                        </tr>
 
                                         <tr>
                                             <td class="text-gray-800 fw-bold fs-5" style="color: #003153;">Total Premium (Inc VAT)</td>

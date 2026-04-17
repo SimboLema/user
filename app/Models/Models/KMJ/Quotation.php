@@ -125,8 +125,8 @@ class Quotation extends Model
     protected $dates = [
         'cover_note_start_date',
         'cover_note_end_date',
-        'approved_at',      // ADD THIS
-        'rejected_at',      // ADD THIS
+        'approved_at',     
+        'rejected_at',
     ];
 
     // -------------------------

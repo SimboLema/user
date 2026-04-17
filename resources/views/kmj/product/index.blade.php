@@ -189,34 +189,7 @@
                         <!--begin::Table container-->
                         <div class="table-responsive">
 
-                            @php
-                                $products = [
-                                    (object) [
-                                        'id' => 1,
-                                        'name' => 'iPhone 15 Pro Max',
-                                        'category' => 'Smartphones',
-                                        'price' => '3,900,000',
-                                        'stock' => 12,
-                                        'agent_code' => 'AGT-001',
-                                    ],
-                                    (object) [
-                                        'id' => 2,
-                                        'name' => 'Toyota Car Tracker',
-                                        'category' => 'Vehicle Devices',
-                                        'price' => '650,000',
-                                        'stock' => 7,
-                                        'agent_code' => 'AGT-002',
-                                    ],
-                                    (object) [
-                                        'id' => 3,
-                                        'name' => 'Samsung S24 Ultra',
-                                        'category' => 'Smartphones',
-                                        'price' => '3,200,000',
-                                        'stock' => 15,
-                                        'agent_code' => 'AGT-003',
-                                    ],
-                                ];
-                            @endphp
+
 
                             <table id="myTable" class="table align-middle table-row-bordered table-row-solid gy-4 gs-9"
                                 style="padding-top:10px;">
@@ -233,24 +206,7 @@
                                 </thead>
 
                                 <tbody>
-                                    @foreach ($products as $index => $product)
-                                        <tr class="text-gray-700 fw-semibold">
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>{{ $product->name }}</td>
-                                            <td>{{ $product->category }}</td>
-                                            <td>{{ $product->price }}</td>
-                                            <td>{{ $product->stock }}</td>
-                                            <td>{{ $product->agent_code }}</td>
-
-                                            <td>
-                                                <a href="#" class="btn btn-sm"
-                                                    style="background-color: #9aa89b; color: white; padding: 4px 8px; font-size: 10px; width: auto;"
-                                                    title="View More">
-                                                    <small>View More</small>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
+                                   
                                 </tbody>
                             </table>
 

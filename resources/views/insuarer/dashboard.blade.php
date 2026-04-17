@@ -74,11 +74,11 @@
 
                             <!--begin::Title-->
                             <h3 class="card-title align-items-start flex-column text-white pt-15">
-                                <span class="fw-bold fs-1x mb-3">Premium (Ex VAT)</span>
+                                <span class="fw-bold fs-1x mb-3"></span>
 
                                 <div class="fs-4 text-white">
                                     <span class="position-relative d-inline-block">
-                                        <a href="#" class="text-white fs-2x fw-bold d-block mb-1">Tsh. 0.00</a>
+                                        <a href="#" class="text-white fs-2x fw-bold d-block mb-1"></a>
                                     </span>
                                 </div>
                             </h3>
@@ -172,6 +172,21 @@
                                     </div>
 
                                     <div class="col-4 d-flex justify-content-center">
+                                        <a href="{{ route('insuarer.agreements.show') }}" class="d-block w-100 text-decoration-none">
+                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 shadow-lg mt-3 w-100 h-100">
+                                                <div class="symbol symbol-30px mb-4 d-flex justify-content-center align-items-center">
+                                                    <span class="symbol-label1 rounded-3">
+                                                        <i class="bi bi-file-earmark-check fs-1 fw-bold text-primary"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="text-center">
+                                                    <span class="text-gray-700 fw-bolder d-block fs-9 text-nowrap">Agreements</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                    <div class="col-4 d-flex justify-content-center">
                                         <a href="{{ route('insuarer.support') }}" class="d-block w-100 text-decoration-none">
                                             <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 shadow-lg mt-3 w-100 h-100">
                                                 <div class="symbol symbol-30px mb-4 d-flex justify-content-center align-items-center">
@@ -186,50 +201,10 @@
                                         </a>
                                     </div>
 
-                                    <div class="col-4 d-flex justify-content-center">
-                                        <a href="{{ route('insuarer.quotations') }}" class="d-block w-100 text-decoration-none">
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 shadow-lg mt-3 w-100 h-100">
-                                                <div class="symbol symbol-30px mb-4 d-flex justify-content-center align-items-center">
-                                                    <span class="symbol-label1 rounded-3">
-                                                        <i class="bi bi-clipboard-check fs-1 fw-bold text-primary"></i>
-                                                    </span>
-                                                </div>
-                                                <div class="text-center">
-                                                    <span class="text-gray-700 fw-bolder d-block fs-9 text-nowrap">My Quotations</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
 
-                                    <div class="col-4 d-flex justify-content-center">
-                                        <a href="{{ route('insuarer.quotations') }}" class="d-block w-100 text-decoration-none">
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 shadow-lg mt-3 w-100 h-100">
-                                                <div class="symbol symbol-30px mb-4 d-flex justify-content-center align-items-center">
-                                                    <span class="symbol-label1 rounded-3">
-                                                        <i class="bi bi-graph-up fs-1 fw-bold text-primary"></i>
-                                                    </span>
-                                                </div>
-                                                <div class="text-center">
-                                                    <span class="text-gray-700 fw-bolder d-block fs-9 text-nowrap">Analytics</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
 
-                                    <div class="col-4 d-flex justify-content-center">
-                                        <a href="{{ route('insuarer.quotations') }}" class="d-block w-100 text-decoration-none">
-                                            <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 shadow-lg mt-3 w-100 h-100">
-                                                <div class="symbol symbol-30px mb-4 d-flex justify-content-center align-items-center">
-                                                    <span class="symbol-label1 rounded-3">
-                                                        <i class="bi bi-download fs-1 fw-bold text-primary"></i>
-                                                    </span>
-                                                </div>
-                                                <div class="text-center">
-                                                    <span class="text-gray-700 fw-bolder d-block fs-9 text-nowrap">Downloads</span>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
+
+
 
                                 </div>
                                 <!--end::Row-->
@@ -345,7 +320,7 @@
                                                         <div class="d-flex flex-column flex-shrink-0 me-4">
                                                             <div class="d-flex align-items-center fs-7 fw-bold text-gray-500 mb-2 animate__animated animate__fadeInUp"
                                                                 style="animation-delay: 0.1s">
-                                                                <span class="fs-2 ms-1" style="color:#003153;">0</span>
+                                                                <span class="fs-2 ms-1" style="color:#003153;">{{ $approvedQuotations }}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -424,10 +399,7 @@
 
                                             <div class="m-0 animate__animated animate__fadeInUp"
                                                 style="animation-delay: 0.4s">
-                                                <a href="#" class="btn btn-sm mb-2 btn-hover-rise"
-                                                    style="background-color: #9aa89b; color:white;">
-                                                    Edit Profile
-                                                </a>
+
                                             </div>
                                         </div>
 
@@ -529,85 +501,10 @@
                     <!--begin::Table widget-->
                     <div class="card card-flush h-md-100">
                         <!--begin::Header-->
-                        <div class="card-header pt-7">
-                            <div class="d-flex align-items-center justify-content-between mb-4 w-100">
-                                <h3 class="card-title align-items-start flex-column mb-0">
-                                    <span class="card-label fw-bold" style="color:#003153;">Recent Quotations</span>
-                                </h3>
-                                <a href="{{ route('insuarer.quotations') }}" class="btn" style="background-color: #9aa89b; color: white;">
-                                    View All
-                                </a>
-                            </div>
-                        </div>
                         <!--end::Header-->
 
                         <!--begin::Body-->
-                        <div class="card-body pt-6">
-                            <!--begin::Table container-->
-                            <div class="table-responsive">
-                                <!--begin::Table-->
-                                <table class="table align-middle table-row-bordered table-row-solid gy-4 gs-9">
-                                    <!--begin::Table head-->
-                                    <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
-                                        <tr>
-                                            <th class="min-w-100px text-center">ID</th>
-                                            <th class="min-w-100px text-center">Client</th>
-                                            <th class="min-w-100px text-center">Type</th>
-                                            <th class="min-w-100px text-center">Amount</th>
-                                            <th class="min-w-100px text-center">Created At</th>
-                                            <th class="min-w-100px text-center">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <!--end::Table head-->
 
-                                    <!--begin::Table body-->
-                                    <tbody>
-                                        <tr class="text-gray-600 fs-6 fw-semibold text-center border-bottom-2">
-                                            <td class="ps-9">QT-001</td>
-                                            <td class="ps-0">John Doe</td>
-                                            <td class="ps-0">Motor</td>
-                                            <td class="ps-0">150,000.00</td>
-                                            <td class="ps-0">2025-07-14</td>
-                                            <td class="text-center">
-                                                <span class="badge border border-success text-success d-inline-block text-center"
-                                                    style="width: 80px; color: green !important;">
-                                                    Approved
-                                                </span>
-                                            </td>
-                                        </tr>
-
-                                        <tr class="text-gray-600 fs-6 fw-semibold text-center border-bottom-2">
-                                            <td class="ps-9">QT-002</td>
-                                            <td class="ps-0">Jane Smith</td>
-                                            <td class="ps-0">Fire</td>
-                                            <td class="ps-0">200,000.00</td>
-                                            <td class="ps-0">2025-07-10</td>
-                                            <td class="text-center">
-                                                <span class="badge border border-warning text-Warning d-inline-block text-center"
-                                                    style="width: 80px; color: orange !important;">
-                                                    Pending
-                                                </span>
-                                            </td>
-                                        </tr>
-
-                                        <tr class="text-gray-600 fs-6 fw-semibold text-center border-bottom-2">
-                                            <td class="ps-9">QT-003</td>
-                                            <td class="ps-0">Ahmed Hassan</td>
-                                            <td class="ps-0">Marine</td>
-                                            <td class="ps-0">500,000.00</td>
-                                            <td class="ps-0">2025-06-30</td>
-                                            <td class="text-center">
-                                                <span class="badge border border-info text-info d-inline-block text-center"
-                                                    style="width: 80px;">
-                                                    Processing
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    <!--end::Table body-->
-                                </table>
-                            </div>
-                        </div>
                         <!--end: Card Body-->
                     </div>
                     <!--end::Table widget-->

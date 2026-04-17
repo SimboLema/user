@@ -4,7 +4,7 @@ namespace App\Http\Controllers\KMJ;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Models\Kmj\Insuarer;
+use App\Models\Models\KMJ\Insuarer;
 use App\Models\Models\Kmj\Customer;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,7 +22,7 @@ class AdminInsuarerController extends Controller
     }
     public function store(Request $request){
 
-        
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email'=>'required|email|unique:insuarers,email',

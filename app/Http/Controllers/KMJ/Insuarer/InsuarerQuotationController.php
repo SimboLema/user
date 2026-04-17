@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\KMJ\Insuarer;
 
 use App\Http\Controllers\Controller;
-use App\Services\WhatsAppService;
+use App\Services\WhatsappService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -19,30 +19,53 @@ class InsuarerQuotationController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $insuarerId = Auth::guard('insuarer')->id();
-        $search = $request->input('search');
+{
+    $insuarerId = Auth::guard('insuarer')->id();
+    $search = $request->input('search');
 
-        $quotations = Quotation::where('insuarer_id', $insuarerId)
-            ->when($search, function ($query, $search) {
-                return $query->where(function ($q) use ($search) {
-                    // Search by Quotation ID (handling the offset you used in view)
-                    $q->where('id', 'like', "%{$search}%")
-                      // Search by Customer Name (assuming relationship exists)
-                      ->orWhereHas('customer', function ($customerQuery) use ($search) {
-                          $customerQuery->where('name', 'like', "%{$search}%");
-                      })
-                      // Search by Risk Name
-                      ->orWhereHas('coverage', function ($coverageQuery) use ($search) {
-                          $coverageQuery->where('risk_name', 'like', "%{$search}%");
-                      });
-                });
-            })
-            ->latest()
-            ->paginate(15);
+    // Base query (important to reuse)
+    $baseQuery = Quotation::where('insuarer_id', $insuarerId);
 
-        return view('insuarer.quotation.index', compact('quotations', 'search'));
-    }
+    // STATISTICS
+    $totalQuotations = (clone $baseQuery)->count();
+
+    $pendingQuotations = (clone $baseQuery)
+        ->where('status', 'pending')
+        ->count();
+
+    $approvedQuotations = (clone $baseQuery)
+        ->where('status', 'approved')
+        ->count();
+
+    $cancelledQuotations = (clone $baseQuery)
+        ->where('status', 'cancelled')
+        ->count();
+
+    // LISTING (with search)
+    $quotations = $baseQuery
+        ->when($search, function ($query, $search) {
+            return $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($customerQuery) use ($search) {
+                        $customerQuery->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('coverage', function ($coverageQuery) use ($search) {
+                        $coverageQuery->where('risk_name', 'like', "%{$search}%");
+                    });
+            });
+        })
+        ->latest()
+        ->paginate(15);
+
+    return view('insuarer.quotation.index', compact(
+        'quotations',
+        'search',
+        'totalQuotations',
+        'pendingQuotations',
+        'approvedQuotations',
+        'cancelledQuotations'
+    ));
+}
 
     public function updateStatus(Request $request, $id)
     {
@@ -82,8 +105,8 @@ class InsuarerQuotationController extends Controller
                 $this->sendRejectionNotifications($quotation);
             }
 
-            $message = $newStatus === 'approved' 
-                ? 'Quotation approved successfully! Customer and broker have been notified.' 
+            $message = $newStatus === 'approved'
+                ? 'Quotation approved successfully! Customer and broker have been notified.'
                 : 'Quotation cancelled. Customer and broker have been notified.';
 
             return redirect()->back()->with('success', $message);
@@ -114,7 +137,7 @@ class InsuarerQuotationController extends Controller
         try {
             // Notify Customer
             $this->sendApprovalMessageToCustomer($quotation);
-            
+
             // Notify Broker
             $this->sendApprovalMessageToBroker($quotation);
 
@@ -131,7 +154,7 @@ class InsuarerQuotationController extends Controller
         try {
             // Notify Customer
             $this->sendRejectionMessageToCustomer($quotation);
-            
+
             // Notify Broker
             $this->sendRejectionMessageToBroker($quotation);
 
@@ -160,8 +183,8 @@ class InsuarerQuotationController extends Controller
             $message .= "Quotation Summary:\n";
             $message .= "- Insurance Type: " . ($quotation->coverage->product->name ?? 'N/A') . "\n";
             $message .= "- Premium Amount: " . number_format($quotation->total_premium_including_tax, 2) . " " . ($quotation->currency->code ?? 'TZS') . "\n";
-            $message .= "- Coverage Start: " . $quotation->cover_note_start_date->format('d-m-Y') . "\n";
-            $message .= "- Coverage End: " . $quotation->cover_note_end_date->format('d-m-Y') . "\n\n";
+            $message .= "- Coverage Start: " . \Carbon\Carbon::parse($quotation->cover_note_start_date)->format('d-m-Y') . "\n";
+            $message .= "- Coverage End: " . \Carbon\Carbon::parse($quotation->cover_note_end_date)->format('d-m-Y') . "\n\n";
             $message .= "Please proceed with payment to finalize your policy.\n";
             $message .= "Contact us for any questions.\n\n";
             $message .= "Quotation Reference: #" . $quotation->id;
@@ -278,5 +301,34 @@ class InsuarerQuotationController extends Controller
         } catch (\Exception $e) {
             Log::error('Error sending WhatsApp rejection message to broker: ' . $e->getMessage());
         }
+    }
+
+    //Hii ni method ya kuset ela ambayo itakua autoapproved bila kupita kwa insuarer
+    public function editAgreement()
+    {
+        $insurerId = Auth::guard('insuarer')->id();
+
+        $insurer = \App\Models\Models\KMJ\Insuarer::find($insurerId);
+
+        return view('insuarer.agreements.edit', compact('insurer'));
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'auto_approval_limit' => 'nullable|numeric|min:0',
+        ]);
+
+        $insurerId = Auth::guard('insuarer')->id();
+
+        $insurer = \App\Models\Models\KMJ\Insuarer::find($insurerId);
+
+        $insurer->update([
+            'auto_approval_limit' => $request->auto_approval_limit,
+        ]);
+
+        return redirect()
+            ->route('insuarer.agreements.show')
+            ->with('success', 'Auto approval limit updated successfully');
     }
 }

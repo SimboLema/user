@@ -13,6 +13,7 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "railsware/mailtrap-php": "^3.11",
         "spatie/array-to-xml": "^3.4",
         "spatie/laravel-activitylog": "^4.10",
         "spatie/laravel-permission": "^6.16",

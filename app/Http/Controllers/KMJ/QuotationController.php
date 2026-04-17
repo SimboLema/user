@@ -40,7 +40,7 @@ use Illuminate\Support\Facades\Log;
 use App\Mail\QuotationCreatedMail;
 use App\Mail\QuotationApprovedMail;
 use Illuminate\Support\Facades\Mail;
-use App\Services\WhatsAppService;
+use App\Services\WhatsappService;
 
 class QuotationController extends Controller
 {
@@ -56,7 +56,7 @@ class QuotationController extends Controller
         $insurance = Insurance::all();
         $insuarers = Insuarer::all();
 
-        $currencies = Currency::where('id', 1)->get();
+        $currencies = Currency::whereIn('id', [1,2])->get();
         $reinsurance_categories = ReinsuranceCategory::all();
         $participant_types = ParticipantType::all();
         $reinsurance_forms = ReinsuranceForm::all();
@@ -429,6 +429,17 @@ class QuotationController extends Controller
             // product
             $product = $coverage->product;
 
+            // NIMEONGEZA LEO
+            $insurer = Insuarer::find($coverage->product->insurance->id);
+
+            $status = 'pending'; // default
+
+            if ($insurer && $insurer->auto_approval_limit !== null) {
+                if ($sumInsured <= $insurer->auto_approval_limit) {
+                    $status = 'approved';
+                }
+            }
+            //
 
             $quotationData = [
                 "insuarer_id" => $coverage->product->insurance->id,
@@ -449,6 +460,9 @@ class QuotationController extends Controller
                 "commission_paid" => $commission_paid,
                 "commission_rate" => $commission_rate,
                 "sum_insured" => $sumInsured,
+                //Nimeongeza leo
+                "status" => $status,
+                //
                 "premium_rate" => $premiumRate,
                 "premium_before_discount" => $premiumExcludingTax,
                 "premium_after_discount" => $premiumExcludingTax,
@@ -522,10 +536,16 @@ class QuotationController extends Controller
                 }
             }
 
-            $insurer = $quotation->insuarer;
-            if ($insurer && $insurer->email) {
-                Mail::to($insurer->email)->send(new QuotationCreatedMail($quotation));
-            }
+            // Send email to insurer
+                $insurer = $quotation->insuarer;
+                if ($insurer && $insurer->email) {
+                    try {
+                        $mail = new QuotationCreatedMail($quotation);
+                        $mail->send($insurer->email, $insurer->name ?? 'Insurer');
+                    } catch (Exception $mailException) {
+                        Log::error('Mailtrap email failed: ' . $mailException->getMessage());
+                    }
+                }
 
             //send whatsapp sms to insuarer
             $this->sendQuotationToInsurer($quotation, $insurer);
@@ -533,7 +553,7 @@ class QuotationController extends Controller
             return redirect()
                 ->route('kmj.quotation')
                 ->with('success', 'Quotation Created Successfully!');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
             return response()->json([
                 'success' => false,
@@ -618,7 +638,8 @@ class QuotationController extends Controller
     public function addons($id)
     {
         $quotation = Quotation::find($id);
-        return view('kmj.quotation.tabs.addons', compact('quotation'));
+        $addons = AddonProduct::all();
+        return view('kmj.quotation.tabs.addons', compact('quotation','addons'));
     }
 
     // Customer tab
@@ -712,18 +733,70 @@ class QuotationController extends Controller
 
     public function downloadQuotation($id)
     {
-        $quotation = Quotation::find($id);
+    $quotation = Quotation::with([
+        'customer',
+        'coverage.product',
+        'insuarer'
+    ])->find($id);
 
-        if (!$quotation) {
-            Log::warning("Quotation not found", ['quotation_id' => $id]);
-            return back()->with('error', 'Quotation haijapatikana.');
+    if (!$quotation) {
+        Log::warning("Quotation not found", ['quotation_id' => $id]);
+        return back()->with('error', 'Quotation haijapatikana.');
+    }
+
+    Log::info("Quotation loaded, generating PDF", ['quotation_id' => $quotation->id]);
+
+    //  Build details array (moved from Blade)
+    $quotationDetails = [
+        'Customer Name' => ucwords(strtolower($quotation->customer->name ?? '')),
+        'Product' => ucwords(strtolower($quotation->coverage->product->name ?? '')),
+        'Coverage' => ucwords(strtolower($quotation->coverage->risk_name ?? '')),
+        'Insurer Name' => ucwords(strtolower($quotation->insuarer->name ?? '')),
+        'Intermediary' => 'KMJ Insurance Brokers Ltd',
+
+        'Cover Note Start Date' => optional($quotation->cover_note_start_date)->format('d M Y'),
+        'Cover Note End Date' => optional($quotation->cover_note_end_date)->format('d M Y'),
+
+        'Exchange Rate' => number_format($quotation->exchange_rate ?? 0, 2),
+
+        'Total Premium (Excl. Tax)' => number_format($quotation->total_premium_excluding_tax ?? 0, 2),
+        'Total Premium (Incl. Tax)' => number_format($quotation->total_premium_including_tax ?? 0, 2),
+    ];
+
+    //  Additional financial details (only if not fleet)
+    if (empty($quotation->fleet_id)) {
+        $quotationDetails['Sum Insured'] = number_format($quotation->sum_insured ?? 0, 2);
+        $quotationDetails['Premium Rate (%)'] = number_format(($quotation->premium_rate ?? 0) * 100, 2);
+        $quotationDetails['Premium Before Discount'] = number_format($quotation->premium_before_discount ?? 0, 2);
+        $quotationDetails['Premium After Discount'] = number_format($quotation->premium_after_discount ?? 0, 2);
+        $quotationDetails['Premium Excl. Tax (Equivalent)'] = number_format($quotation->premium_excluding_tax_equivalent ?? 0, 2);
+        $quotationDetails['Premium Incl. Tax'] = number_format($quotation->premium_including_tax ?? 0, 2);
+        $quotationDetails['Tax Rate (%)'] = number_format(($quotation->tax_rate ?? 0) * 100, 2);
+        $quotationDetails['Tax Amount'] = number_format($quotation->tax_amount ?? 0, 2);
+
+        if (optional($quotation->coverage->product)->insurance_id == 2) {
+            $quotationDetails['Sticker Number'] = $quotation->sticker_number ?? '';
         }
 
-        Log::info("Quotation loaded, generating PDF", ['quotation_id' => $quotation->id]);
-
-        $pdf = Pdf::loadView('kmj.quotation.downloads.quotation_pdf', compact('quotation'));
-        return $pdf->stream('quotation_' . $quotation->id . '.pdf');
+        $quotationDetails['Cover Note Reference'] = $quotation->cover_note_reference ?? '';
     }
+
+    //Status fields
+    $quotationDetails['Acknowledgement Status Code'] = $quotation->acknowledgement_status_code ?? '';
+    $quotationDetails['Acknowledgement Status Description'] = $quotation->acknowledgement_status_desc ?? '';
+    $quotationDetails['Response Status Code'] = $quotation->response_status_code ?? '';
+    $quotationDetails['Response Status Description'] = $quotation->response_status_desc ?? '';
+    $quotationDetails['Request ID'] = $quotation->request_id ?? '';
+
+    //Pass BOTH variables to Blade
+    $pdf = Pdf::loadView(
+        'kmj.quotation.downloads.quotation_pdf',
+        compact('quotation', 'quotationDetails')
+    );
+
+    return $pdf->stream('quotation_' . $quotation->id . '.pdf');
+    }
+
 
     public function downloadPayment($id)
     {

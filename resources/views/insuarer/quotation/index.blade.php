@@ -9,47 +9,31 @@
 
     <!--begin::Toolbar-->
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-18">
-        <!--begin::Toolbar container-->
         <div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
-
-            <!--begin::Page title-->
             <div class="page-title d-flex flex-column justify-content-center me-3">
-                <!--begin::Title-->
                 <h1 class="page-heading d-flex text-white fw-bold fs-3 flex-column justify-content-center my-0"
                     style="color: #003153 !important;">
                     My Quotations
                 </h1>
-                <!--end::Title-->
-
-                <!--begin::Breadcrumb-->
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
                     <li class="breadcrumb-item text-muted">
-                        <a href="{{ route('insuarer.dashboard') }}" class="text-muted text-hover-primary">
-                            Home | </a>
+                        <a href="{{ route('insuarer.dashboard') }}" class="text-muted text-hover-primary">Home | </a>
                     </li>
                     <li class="breadcrumb-item text-muted">Quotations</li>
                 </ul>
-                <!--end::Breadcrumb-->
             </div>
-            <!--end::Page title-->
-
-            <!--begin::Actions-->
             <div class="d-flex align-items-center gap-3">
                 <a href="{{ route('insuarer.dashboard') }}" class="btn btn-sm"
-                    style="text-decoration: none; color: inherit; background-color: #9aa89b; color: white;">
+                    style="text-decoration: none; background-color: #9aa89b; color: white;">
                     <i class="bi bi-arrow-left me-2"></i><span>Back to Dashboard</span>
                 </a>
             </div>
-            <!--end::Actions-->
         </div>
-        <!--end::Toolbar container-->
     </div>
     <!--end::Toolbar-->
 
     <!--begin::Content-->
     <div id="kt_app_content" class="app-content flex-column-fluid">
-
-        <!--begin::Content container-->
         <div id="kt_app_content_container" class="app-container container-xxl">
 
             <!--begin::Search and Filter Section-->
@@ -77,7 +61,6 @@
                                                style="padding-left: 2.5rem; border-radius: 10px;">
                                     </div>
                                 </div>
-
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold mb-3">&nbsp;</label>
                                     <div class="d-flex gap-2">
@@ -85,7 +68,6 @@
                                             style="background-color: #003153; color: white; border-radius: 8px;">
                                             <i class="bi bi-search me-2"></i>Search
                                         </button>
-
                                         @if($search)
                                             <a href="{{ route('insuarer.quotations') }}" class="btn btn-light fw-bold px-6"
                                                 style="border-radius: 8px;">
@@ -118,7 +100,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-3">
                     <div class="card card-flush shadow-sm h-100">
                         <div class="card-body d-flex justify-content-between align-items-center py-6">
@@ -134,7 +115,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-3">
                     <div class="card card-flush shadow-sm h-100">
                         <div class="card-body d-flex justify-content-between align-items-center py-6">
@@ -150,7 +130,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-3">
                     <div class="card card-flush shadow-sm h-100">
                         <div class="card-body d-flex justify-content-between align-items-center py-6">
@@ -173,7 +152,6 @@
             <div class="row gx-5 gx-xl-10">
                 <div class="col-xl-12">
                     <div class="card card-flush h-md-100 shadow-sm">
-                        <!--begin::Header-->
                         <div class="card-header border-0 pt-7">
                             <h3 class="card-title align-items-start flex-column">
                                 <span class="card-label fw-bold" style="color: #003153;">Quotations List</span>
@@ -186,15 +164,10 @@
                                 </span>
                             </h3>
                         </div>
-                        <!--end::Header-->
 
-                        <!--begin::Body-->
                         <div class="card-body pt-6">
-                            <!--begin::Table container-->
                             <div class="table-responsive">
-                                <!--begin::Table-->
                                 <table class="table align-middle table-row-bordered table-row-solid gy-4 gs-9">
-                                    <!--begin::Table head-->
                                     <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
                                         <tr>
                                             <th class="min-w-50px text-center">#</th>
@@ -206,9 +179,6 @@
                                             <th class="min-w-100px text-end">Actions</th>
                                         </tr>
                                     </thead>
-                                    <!--end::Table head-->
-
-                                    <!--begin::Table body-->
                                     <tbody class="fs-6 fw-semibold text-gray-600">
                                         @forelse ($quotations as $quotation)
                                             <tr>
@@ -246,11 +216,11 @@
                                                 <td class="text-center">
                                                     @php
                                                         $statusConfig = match($quotation->status ?? 'pending') {
-                                                            'success' => ['class' => 'badge-success', 'text' => 'Approved', 'icon' => 'check-circle'],
-                                                            'approved' => ['class' => 'badge-success', 'text' => 'Approved', 'icon' => 'check-circle'],
-                                                            'pending' => ['class' => 'badge-warning', 'text' => 'Pending', 'icon' => 'clock-history'],
-                                                            'cancelled' => ['class' => 'badge-danger', 'text' => 'Cancelled', 'icon' => 'x-circle'],
-                                                            default => ['class' => 'badge-secondary', 'text' => 'Unknown', 'icon' => 'question-circle']
+                                                            'success'   => ['class' => 'badge-success',   'text' => 'Approved',  'icon' => 'check-circle'],
+                                                            'approved'  => ['class' => 'badge-success',   'text' => 'Approved',  'icon' => 'check-circle'],
+                                                            'pending'   => ['class' => 'badge-warning',   'text' => 'Pending',   'icon' => 'clock-history'],
+                                                            'cancelled' => ['class' => 'badge-danger',    'text' => 'Cancelled', 'icon' => 'x-circle'],
+                                                            default     => ['class' => 'badge-secondary', 'text' => 'Unknown',   'icon' => 'question-circle']
                                                         };
                                                     @endphp
                                                     <span class="badge {{ $statusConfig['class'] }} d-inline-block">
@@ -259,36 +229,43 @@
                                                 </td>
                                                 <td class="text-end">
                                                     <div class="d-flex justify-content-end gap-2">
+
+                                                        {{-- View Button --}}
                                                         <a href="{{ route('insuarer.quotation.show', $quotation->id) }}"
-                                                           class="btn btn-sm btn-light-primary rounded-pill px-4 fw-bold"
+                                                           class="kmj-btn kmj-btn-view rounded-pill"
                                                            title="View quotation details">
                                                             <i class="bi bi-eye me-1"></i>View
                                                         </a>
 
                                                         @if (in_array($quotation->status ?? 'pending', ['pending']))
                                                             <div class="d-flex gap-1">
+
+                                                                {{-- Approve Button --}}
                                                                 <form action="{{ route('insuarer.quotation.updateStatusApprove', $quotation->id) }}"
                                                                       method="POST" class="d-inline">
                                                                     @csrf
                                                                     @method('POST')
                                                                     <input type="hidden" name="status" value="approved">
-                                                                    <button type="submit" class="btn btn-sm btn-light-success rounded-pill px-3"
+                                                                    <button type="submit"
+                                                                            class="kmj-btn kmj-btn-approve rounded-pill"
                                                                             title="Approve this quotation">
                                                                         <i class="bi bi-check me-1"></i>Approve
                                                                     </button>
                                                                 </form>
 
+                                                                {{-- Cancel Button --}}
                                                                 <form action="{{ route('insuarer.quotation.updateStatusReject', $quotation->id) }}"
                                                                       method="POST" class="d-inline">
                                                                     @csrf
-                                                                    @method('PUT')
                                                                     <input type="hidden" name="status" value="cancelled">
-                                                                    <button type="submit" class="btn btn-sm btn-light-danger rounded-pill px-3"
-                                                                            title="Cancel this quotation"
+                                                                    <input type="hidden" name="rejection_reason" value="Cancelled by insurer">
+                                                                    <button type="submit"
+                                                                            class="kmj-btn kmj-btn-cancel rounded-pill"
                                                                             onclick="return confirm('Are you sure you want to cancel this quotation?')">
                                                                         <i class="bi bi-x me-1"></i>Cancel
                                                                     </button>
                                                                 </form>
+
                                                             </div>
                                                         @endif
                                                     </div>
@@ -310,28 +287,21 @@
                                             </tr>
                                         @endforelse
                                     </tbody>
-                                    <!--end::Table body-->
                                 </table>
-                                <!--end::Table-->
                             </div>
-                            <!--end::Table container-->
 
-                            <!--begin::Pagination-->
                             @if($quotations->hasPages())
                                 <div class="mt-6 px-4">
                                     {{ $quotations->appends(['search' => $search ?? ''])->links('pagination::bootstrap-5') }}
                                 </div>
                             @endif
-                            <!--end::Pagination-->
                         </div>
-                        <!--end::Body-->
                     </div>
                 </div>
             </div>
             <!--end::Quotations Table-->
 
         </div>
-        <!--end::Content container-->
     </div>
     <!--end::Content-->
 
@@ -339,7 +309,53 @@
 <!--end::Content wrapper-->
 
 <style>
-    /* Badge Styles */
+    /* ───── Custom Action Buttons (avoids Metronic class conflicts) ───── */
+    .kmj-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.85rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        outline: none !important;
+        box-shadow: none !important;
+        transition: none !important;
+        text-decoration: none;
+    }
+
+    /* View – blue */
+    .kmj-btn-view,
+    .kmj-btn-view:hover,
+    .kmj-btn-view:focus,
+    .kmj-btn-view:active,
+    .kmj-btn-view:visited {
+        background-color: #e8f0ff !important;
+        color: #0066cc !important;
+        box-shadow: none !important;
+    }
+
+    /* Approve – green */
+    .kmj-btn-approve,
+    .kmj-btn-approve:hover,
+    .kmj-btn-approve:focus,
+    .kmj-btn-approve:active {
+        background-color: #e1f5f0 !important;
+        color: #00a99d !important;
+        box-shadow: none !important;
+    }
+
+    /* Cancel – red */
+    .kmj-btn-cancel,
+    .kmj-btn-cancel:hover,
+    .kmj-btn-cancel:focus,
+    .kmj-btn-cancel:active {
+        background-color: #ffe1e1 !important;
+        color: #ef4444 !important;
+        box-shadow: none !important;
+    }
+
+    /* ───── Badge Styles ───── */
     .badge-success {
         background-color: #e1f5f0 !important;
         color: #00a99d !important;
@@ -380,44 +396,7 @@
         font-size: 0.85rem !important;
     }
 
-    /* Button Light Variants */
-    .btn-light-primary {
-        background-color: #e8f0ff !important;
-        color: #0066cc !important;
-        border: none !important;
-        font-weight: 600 !important;
-    }
-
-    .btn-light-primary:hover {
-        background-color: #d0e0ff !important;
-        color: #0052a3 !important;
-    }
-
-    .btn-light-success {
-        background-color: #e1f5f0 !important;
-        color: #00a99d !important;
-        border: none !important;
-        font-weight: 600 !important;
-    }
-
-    .btn-light-success:hover {
-        background-color: #c2ebea !important;
-        color: #008078 !important;
-    }
-
-    .btn-light-danger {
-        background-color: #ffe1e1 !important;
-        color: #ef4444 !important;
-        border: none !important;
-        font-weight: 600 !important;
-    }
-
-    .btn-light-danger:hover {
-        background-color: #ffc2c2 !important;
-        color: #dc2626 !important;
-    }
-
-    /* Table Refinement */
+    /* ───── Table Refinement ───── */
     .table thead th {
         background-color: #fcfcfd;
         text-transform: uppercase;
@@ -436,7 +415,7 @@
         background-color: #f9fafb;
     }
 
-    /* Card Styles */
+    /* ───── Card Styles ───── */
     .card {
         border: 1px solid rgba(0, 0, 0, 0.05);
         border-radius: 12px;
