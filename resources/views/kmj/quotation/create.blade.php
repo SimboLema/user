@@ -153,6 +153,7 @@
                                     <form method="post" action="{{ route('kmj.quotation.store') }}"
                                         enctype="multipart/form-data" novalidate>
                                         @csrf
+                                        <input type="hidden" name="insuarer_id" value="{{ $insuarerId }}">
                                         <!-- Hidden fields for product information -->
                                         <input type="hidden" name="coverage_id" value="{{ $coverage->id }}">
                                         <input type="hidden" name="insurance_id"

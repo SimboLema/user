@@ -44,13 +44,13 @@
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Cover Note Start Date</label>
+            <label class="form-label">Cover Note Start Date (mm/dd/yy)</label>
             <input class="form-control" type="date" name="cover_note_start_date"
                    id="cover_note_start_date">
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Cover Note End Date</label>
+            <label class="form-label">Cover Note End Date (mm/dd/yy)</label>
             <input class="form-control" type="date" name="cover_note_end_date"
                    id="cover_note_end_date" disabled>
         </div>

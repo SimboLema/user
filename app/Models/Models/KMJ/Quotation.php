@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Models\KMJ\Addon;
 
 class Quotation extends Model
 {
@@ -125,7 +126,7 @@ class Quotation extends Model
     protected $dates = [
         'cover_note_start_date',
         'cover_note_end_date',
-        'approved_at',     
+        'approved_at',
         'rejected_at',
     ];
 
@@ -133,6 +134,11 @@ class Quotation extends Model
     // Relations
     // -------------------------
 
+
+    public function quotationAddons()
+    {
+        return $this->hasMany(Addon::class, 'quotation_id');
+    }
     public function coverage()
     {
         return $this->belongsTo(Coverage::class);

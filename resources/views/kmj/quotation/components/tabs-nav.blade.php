@@ -1,6 +1,9 @@
 @php
     $tabs = [
         [
+            'name' => 'Dashboard', 'route' => 'kmj.index'
+        ],
+        [
             'name' => $quotation->status === 'pending' ? 'Quotation' : 'CoverNote',
             'route' => 'kmj.quotation.covernote',
         ],

@@ -65,7 +65,10 @@ Route::middleware(['auth'])->group(function () {
                 ->name('quotation.RenewCoverNote');
             Route::get('/{id}/payment', [QuotationController::class, 'payment'])->name('kmj.quotation.payment');
             Route::get('/{id}/transaction', [QuotationController::class, 'transaction'])->name('kmj.quotation.transaction');
+
             Route::get('/{id}/addons', [QuotationController::class, 'addons'])->name('kmj.quotation.addons');
+            Route::post('/{id}/addons/save', [QuotationController::class, 'saveAddons'])  ->name('kmj.quotation.addons.save');
+
             Route::get('/{id}/customer', [QuotationController::class, 'customer'])->name('kmj.quotation.customer');
             Route::get('/{id}/motor-details', [QuotationController::class, 'motorDetails'])->name('kmj.quotation.motorDetails');
             Route::get('/{id}/documents', [QuotationController::class, 'documents'])->name('kmj.quotation.documents');
@@ -134,6 +137,7 @@ Route::middleware(['auth'])->group(function () {
         //Branch
         Route::get('/branches', [BranchController::class, 'getBranches'])->name('kmj.getBranches');
         Route::get('/branches/report', [BranchController::class, 'getBrancheReport'])->name('kmj.getBranches.report');
+        Route::get('/branches/create', [BranchController::class,'create'])->name('kmj.createBranches');
 
         //Agent
         Route::get('/agents', [AgentController::class, 'getAgents'])->name('kmj.getAgents');

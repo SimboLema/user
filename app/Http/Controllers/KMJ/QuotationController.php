@@ -4,6 +4,7 @@ namespace App\Http\Controllers\KMJ;
 
 use App\Http\Controllers\Controller;
 use App\Models\Models\KMJ\AddonProduct;
+use App\Models\Models\KMJ\Addon;
 use App\Models\Models\KMJ\Country;
 use App\Models\Models\KMJ\Coverage;
 use App\Models\Models\KMJ\CoverNoteDuration;
@@ -52,6 +53,7 @@ class QuotationController extends Controller
     }
     public function index()
     {
+
         $quotations = Quotation::orderBy('id', 'desc')->get();
         $insurance = Insurance::all();
         $insuarers = Insuarer::all();
@@ -153,6 +155,7 @@ class QuotationController extends Controller
     public function getQuotation(Request $request)
     {
         $coverageId = $request->coverage_id;
+        $insuarerId = $request->insuarer_id;
         $coverage = Coverage::find($coverageId);
         $countries = Country::orderBy('name', 'asc')->get();
 
@@ -186,7 +189,7 @@ class QuotationController extends Controller
             'motorTypes',
             'motorUsages',
             'ownerCategories',
-            'countries'
+            'countries','insuarerId'
         ));
     }
 
@@ -317,6 +320,7 @@ class QuotationController extends Controller
 
     public function store(Request $request)
     {
+
         try {
             $customer_id = $request->customer_id;
 
@@ -430,19 +434,19 @@ class QuotationController extends Controller
             $product = $coverage->product;
 
             // NIMEONGEZA LEO
-            $insurer = Insuarer::find($coverage->product->insurance->id);
+            $insurerForApproval = Insuarer::find($coverage->product->insurance->id);
 
             $status = 'pending'; // default
 
-            if ($insurer && $insurer->auto_approval_limit !== null) {
-                if ($sumInsured <= $insurer->auto_approval_limit) {
+            if ($insurerForApproval && $insurerForApproval->auto_approval_limit !== null) {
+                if ($sumInsured <= $insurerForApproval->auto_approval_limit) {
                     $status = 'approved';
                 }
             }
             //
 
             $quotationData = [
-                "insuarer_id" => $coverage->product->insurance->id,
+                "insuarer_id" => $request->insuarer_id,
                 "coverage_id" => $coverage->id,
                 "customer_id" => $customer->id,
                 "cover_note_type_id" => $coverNoteType->id,
@@ -596,7 +600,7 @@ class QuotationController extends Controller
             } else {
                 Log::error('Failed to send WhatsApp to insurer: ' . json_encode($result));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error sending WhatsApp to insurer: ' . $e->getMessage());
         }
     }
@@ -636,11 +640,89 @@ class QuotationController extends Controller
 
     // Addons tab
     public function addons($id)
-    {
-        $quotation = Quotation::find($id);
-        $addons = AddonProduct::all();
-        return view('kmj.quotation.tabs.addons', compact('quotation','addons'));
+{
+    $quotation = Quotation::with('quotationAddons')->find($id);
+    $addons = AddonProduct::all();
+    return view('kmj.quotation.tabs.addons', compact('quotation', 'addons'));
+}
+
+public function saveAddons(Request $request, $id)
+{
+    try {
+        $quotation = Quotation::findOrFail($id);
+
+        $selectedAddonIds = $request->input('addon_ids', []);
+        $totalAddonAmount = 0;
+
+        // Delete old addon records for this quotation first
+        Addon::where('quotation_id', $quotation->id)->delete();
+
+        if (!empty($selectedAddonIds)) {
+            $addonProducts = AddonProduct::whereIn('id', $selectedAddonIds)->get();
+
+            foreach ($addonProducts as $index => $addonProduct) {
+
+                if ($addonProduct->amount_type === 'PREMIUM') {
+                    $addonAmount = $addonProduct->rate * $quotation->premium_before_discount;
+                    $addonRate   = $addonProduct->rate;
+                } else {
+                    $addonAmount = $addonProduct->amount;
+                    $addonRate   = 0;
+                }
+
+                $taxRate       = $quotation->tax_rate;
+                $taxAmount     = $addonAmount * $taxRate;
+                $premiumIncTax = $addonAmount + $taxAmount;
+
+                $totalAddonAmount += $addonAmount;
+
+                Addon::create([
+                    'quotation_id'                     => $quotation->id,
+                    'addon_product_id'                 => $addonProduct->id,
+                    'addon_reference'                  => $index + 1,
+                    'addon_desc'                       => $addonProduct->description,
+                    'addon_amount'                     => $addonAmount,
+                    'addon_rate'                       => $addonRate,
+                    'premium_excluding_tax'            => $addonAmount,
+                    'premium_excluding_tax_equivalent' => $addonAmount,
+                    'premium_including_tax'            => $premiumIncTax,
+                    'tax_code'                         => $quotation->tax_code,
+                    'is_tax_exempted'                  => $quotation->is_tax_exempted ?? 'N',
+                    'tax_exemption_type'               => null,
+                    'tax_exemption_reference'          => null,
+                    'tax_rate'                         => $taxRate,
+                    'tax_amount'                       => $taxAmount,
+                ]);
+            }
+        }
+
+        // Recalculate quotation totals
+        $basePremium            = $quotation->premium_before_discount;
+        $newPremiumExcludingTax = $basePremium + $totalAddonAmount;
+        $newTaxAmount           = $newPremiumExcludingTax * $quotation->tax_rate;
+        $newPremiumIncludingTax = $newPremiumExcludingTax + $newTaxAmount;
+
+        $quotation->update([
+            'total_premium_excluding_tax'      => $newPremiumExcludingTax,
+            'total_premium_including_tax'      => $newPremiumIncludingTax,
+            'premium_excluding_tax_equivalent' => $newPremiumExcludingTax,
+            'premium_including_tax'            => $newPremiumIncludingTax,
+            'premium_after_discount'           => $newPremiumExcludingTax,
+            'tax_amount'                       => $newTaxAmount,
+            'updated_by'                       => Auth::id(),
+        ]);
+
+        return redirect()
+            ->route('kmj.quotation.addons', $quotation->id)
+            ->with('success', 'Addons saved and premium updated successfully!');
+
+    } catch (Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error'   => $e->getMessage(),
+        ]);
     }
+}
 
     // Customer tab
     public function customer($id)

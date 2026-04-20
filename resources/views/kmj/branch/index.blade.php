@@ -137,10 +137,10 @@
                                 <div class="d-flex flex-column">
                                     <!--begin::Name-->
                                     <div class="d-flex align-items-center mb-2 text-white">
-                                        <a href="{{ route('kmj.quotation') }}" class="text-gray-800 fs-2 fw-bolder me-1"
+                                        <a href="{{ route('kmj.index') }}" class="text-gray-800 fs-2 fw-bolder me-1"
                                             style="color: white !important;"><i
                                                 class="bi bi-archive fs-2 section-icon me-3 text-white"></i>
-                                            Agents</a>
+                                            Branches</a>
 
                                     </div>
                                     <!--end::Name-->
@@ -153,21 +153,10 @@
                                     <a href="{{ route('kmj.index') }}" class="btn btn-sm btn-light me-3">Dashboard</a>
                                     <a href="{{ route('kmj.getBranches.report') }}"
                                         class="btn btn-sm btn-light me-3">Report</a>
-                                    <button class="btn btn-sm me-3" id="kt_user_follow_button" data-bs-toggle="modal"
-                                        data-bs-target="#CustomerInfo" style="background-color: #003153; color: white;">
-                                        {{-- <i class="bi bi-plus fs-2 section-icon me-1 text-white"></i> --}}
-                                        <!--begin::Indicator label-->
-                                        <span class="indicator-label">
-                                            Create Agent</span>
-                                        <!--end::Indicator label-->
+                                        <button class="btn btn-sm btn-light me-3" data-bs-toggle="modal" data-bs-target="#createBranchModal">
+                                            Create Branch
+                                        </button>
 
-                                        <!--begin::Indicator progress-->
-                                        <span class="indicator-progress">
-                                            Please wait... <span
-                                                class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                                        </span>
-                                        <!--end::Indicator progress-->
-                                    </button>
                                 </div>
                                 <!--end::Actions-->
                             </div>
@@ -188,44 +177,6 @@
                         <!--begin::Table container-->
                         <div class="table-responsive">
 
-                            @php
-                                $branches = [
-                                    (object) [
-                                        'id' => 1,
-                                        'branch_name' => 'Sinza Mori',
-                                        'region' => 'Dar es Salaam',
-                                        'phone' => '0754123456',
-                                        'manager' => 'John Michael',
-                                        'status' => 'Active',
-                                    ],
-                                    (object) [
-                                        'id' => 2,
-                                        'branch_name' => 'Tabata Bima',
-                                        'region' => 'Dar es Salaam',
-                                        'phone' => '0789456321',
-                                        'manager' => 'Sarah Daniel',
-                                        'status' => 'Inactive',
-                                    ],
-                                    (object) [
-                                        'id' => 3,
-                                        'branch_name' => 'Mbezi Mwisho',
-                                        'region' => 'Dar es Salaam',
-                                        'phone' => '0712233445',
-                                        'manager' => 'Kelvin James',
-                                        'status' => 'Active',
-                                    ],
-                                    (object) [
-                                        'id' => 4,
-                                        'branch_name' => 'Kariakoo',
-                                        'region' => 'Dar es Salaam',
-                                        'phone' => '0765544332',
-                                        'manager' => 'Fatuma Ali',
-                                        'status' => 'Active',
-                                    ],
-                                ];
-                            @endphp
-
-
                             <!--begin::Table-->
                             <table id="myTable" class="table align-middle table-row-bordered table-row-solid gy-4 gs-9"
                                 style="padding-top:10px;">
@@ -235,7 +186,6 @@
                                         <th>Branch</th>
                                         <th>Region</th>
                                         <th>Phone</th>
-                                        <th>Manager</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -245,12 +195,11 @@
                                     @foreach ($branches as $index => $branch)
                                         <tr class="text-gray-700 fw-semibold">
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ ucwords(strtolower($branch->branch_name)) }}</td>
-                                            <td>{{ $branch->region }}</td>
+                                            <td>{{ ucwords(strtolower($branch->name)) }}</td>
+                                            <td>{{ $branch->region->name ?? '-' }}</td>
                                             <td>{{ $branch->phone }}</td>
-                                            <td>{{ ucwords(strtolower($branch->manager)) }}</td>
                                             <td>
-                                                @if ($branch->status == 'Active')
+                                                @if ($branch->status)
                                                     <span class="badge badge-light-success">Active</span>
                                                 @else
                                                     <span class="badge badge-light-danger">Inactive</span>
@@ -258,8 +207,7 @@
                                             </td>
                                             <td>
                                                 <a href="#" class="btn btn-sm"
-                                                    style="background-color: #9aa89b; color: white; padding: 4px 8px; font-size: 10px; width: auto;"
-                                                    title="View More">
+                                                    style="background-color: #9aa89b; color: white; padding: 4px 8px; font-size: 10px;">
                                                     <small>View More</small>
                                                 </a>
                                             </td>
@@ -370,5 +318,65 @@
             });
         });
     </script>
+
+    <!-- Create Branch Modal -->
+<div class="modal fade" id="createBranchModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <form action="#" method="POST">
+                @csrf
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Branch</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Branch Name</label>
+                            <input type="text" name="name" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Region</label>
+                            <select name="region_id" class="form-select select2" required>
+                                <option value="">Select Region</option>
+                                @foreach ($regions as $region)
+                                    <option value="{{ $region->id }}">{{ $region->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone" class="form-control">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        Save Branch
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
 
 @endsection

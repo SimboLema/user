@@ -285,10 +285,10 @@
                         <div class="card-body py-8 px-8">
                             <h4 class="fw-bold mb-6" style="color: #003153;">Actions</h4>
                             <div class="d-flex gap-3">
-                                <form action="{{ route('insuarer.quotation.updateStatus', $quotation->id) }}"
+                                <form action="{{ route('insuarer.quotation.updateStatusApprove', $quotation->id) }}"
                                       method="POST" class="d-inline">
                                     @csrf
-                                    @method('PUT')
+
                                     <input type="hidden" name="status" value="approved">
                                     <button type="submit" class="btn fw-bold px-8 py-3"
                                             style="background-color: #00a99d; color: white; border-radius: 8px;">
@@ -296,10 +296,10 @@
                                     </button>
                                 </form>
 
-                                <form action="{{ route('insuarer.quotation.updateStatus', $quotation->id) }}"
+                                <form action="{{ route('insuarer.quotation.updateStatusReject', $quotation->id) }}"
                                       method="POST" class="d-inline">
                                     @csrf
-                                    @method('PUT')
+                                    
                                     <input type="hidden" name="status" value="cancelled">
                                     <button type="submit" class="btn fw-bold px-8 py-3"
                                             style="background-color: #ef4444; color: white; border-radius: 8px;"

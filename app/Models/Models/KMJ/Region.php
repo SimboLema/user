@@ -5,6 +5,7 @@ namespace App\Models\Models\KMJ;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Models\KMJ\Branches;
 
 class Region extends Model
 {
@@ -21,4 +22,9 @@ class Region extends Model
     {
         return $this->hasMany(District::class);
     }
+
+    public function branches()
+{
+    return $this->hasMany(Branches::class);
+}
 }
