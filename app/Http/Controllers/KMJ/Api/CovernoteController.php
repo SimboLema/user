@@ -14,7 +14,7 @@ class CovernoteController extends Controller
     private string $baseUrl;
     public function __construct()
     {
-        $this->baseUrl = 'https://api.tira.go.tz:8091';
+        $this->baseUrl = 'http://192.168.168.200';
     }
 
     public function index()

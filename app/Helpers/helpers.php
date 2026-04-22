@@ -82,7 +82,7 @@ function TiraRequest($endPoint, $data): array
         ->post($endPoint)
         ->body();
 
-    Log::channel('tiramisxml')->info($res);
+    Log::channel('tiramisxml')->info("ACKNOLGMENT",[$res]);
 
     return ["response" => $res];
 }
