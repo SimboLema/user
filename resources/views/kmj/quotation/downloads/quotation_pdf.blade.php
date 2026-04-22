@@ -282,7 +282,7 @@
 {{-- ============================================================ --}}
 <div class="page">
 
-    <img class="page-header-img" src="{{ public_path('img/Header.jpeg') }}" alt="Header" />
+    <img class="page-header-img" src="{{ public_path('assets/img/Header.jpeg') }}" alt="Header" />
 
     <div class="content">
 
@@ -429,7 +429,7 @@
 
 
 
-    <img class="page-footer-img" src="{{ public_path('img/Footer.jpeg') }}" alt="Footer" />
+    <img class="page-footer-img" src="{{ public_path('assets/img/Footer.jpeg') }}" alt="Footer" />
 
 </div>
 
@@ -440,7 +440,7 @@
 {{-- ============================================================ --}}
 <div class="page">
 
-    <img class="page-header-img" src="{{ public_path('img/Header.jpeg') }}" alt="Header" />
+    <img class="page-header-img" src="{{ public_path('assets/img/Header.jpeg') }}" alt="Header" />
 
     <div class="content">
 
@@ -544,7 +544,7 @@
         <span class="sys">SYSTEMS</span>
     </div>
 
-    <img class="page-footer-img" src="{{ public_path('img/Footer.jpeg') }}" alt="Footer" />
+    <img class="page-footer-img" src="{{ public_path('assets/img/Footer.jpeg') }}" alt="Footer" />
 
 </div>
 
@@ -555,7 +555,7 @@
 {{-- ============================================================ --}}
 <div class="page">
 
-    <img class="page-header-img" src="{{ public_path('img/Header.jpeg') }}" alt="Header" />
+    <img class="page-header-img" src="{{ public_path('assets/img/Header.jpeg') }}" alt="Header" />
 
     <div class="content">
 
@@ -625,7 +625,7 @@
         <span class="sys">SYSTEMS</span>
     </div>
 
-    <img class="page-footer-img" src="{{ public_path('img/Footer.jpeg') }}" alt="Footer" />
+    <img class="page-footer-img" src="{{ public_path('assets/img/Footer.jpeg') }}" alt="Footer" />
 
 </div>
 
