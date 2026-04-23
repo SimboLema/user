@@ -17,7 +17,7 @@ class SendTiraController extends Controller
     private string $baseUrl;
     public function __construct()
     {
-        $this->baseUrl = 'http://192.168.168.200:80';
+        $this->baseUrl = 'http://192.168.168.200:8091';
     }
 
 

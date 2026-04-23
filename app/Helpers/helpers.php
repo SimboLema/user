@@ -26,7 +26,9 @@ function otherUniqueID()
 function generateXML($tiraTag, $data)
 {
     try {
-        return (new ArrayToXml($data, $tiraTag))->dropXmlDeclaration()->prettify()->toXml();
+        $xml = (new ArrayToXml($data, $tiraTag))->dropXmlDeclaration()->prettify()->toXml();
+        Log::channel('tiramisxml')->info("Generated XML before Posted:\n".$xml);
+        return $xml;
     } catch (\Exception $e) {
         report($e);
     }

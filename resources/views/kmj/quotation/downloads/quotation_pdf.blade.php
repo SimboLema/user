@@ -355,13 +355,13 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->
             </tr>
             <tr>
                 <td class="field-label">Intermediary Name</td>
-                <td class="field-value">{{ $q->insuarer->name ?? 'KMJ Insurance Brokers Ltd' }}</td>
+                <td class="field-value">{{  'KMJ Insurance Brokers Ltd' }}</td>
                 <td class="field-label">Cover Period</td>
                 <td class="field-value">{{ $startDate }} &nbsp;–&nbsp; {{ $endDate }}</td>
             </tr>
             <tr>
                 <td class="field-label">Insurance Company</td>
-                <td class="field-value" colspan="3">{{ $insurerName }}</td>
+                <td class="field-value" colspan="3">{{ $q->insuarer->name }}</td>
             </tr>
             <tr>
                 <td class="field-label">Insurance Type</td>
@@ -369,12 +369,7 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->
                     <strong>{{ strtoupper($q->coverage->product->insurance->type ?? ($isMotor ? 'MOTOR' : 'NON-MOTOR')) }}</strong>
                 </td>
             </tr>
-            @if(!$isMotor)
-            <tr>
-                <td class="field-label">Coverage / Risk</td>
-                <td class="field-value" colspan="3">{{ $q->coverage->name ?? '—' }}</td>
-            </tr>
-            @endif
+           
         </table>
 
         {{-- ══════════════════════════════════════════════════════════════ --}}
@@ -412,17 +407,21 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->
                 @php
                     $finKeys  = ['Total Premium (Excl. Tax)', 'Total Premium (Incl. Tax)', 'Tax Amount'];
                     $rowIndex = 0;
-                    // Build detail rows — add/remove fields to match your model
+
+                    // Build detail rows with all coverage fields
                     $quotationDetails = array_filter([
-                        'Coverage'           => $q->coverage->name ?? null,
-                        'Risk Code'          => $q->risk_code ?? null,
-                        'Product Code'       => $q->product_code ?? null,
-                        'Sum Insured'        => $sumInsured > 0 ? number_format($sumInsured, 2) : null,
-                        'Premium Rate'       => $q->premium_rate ? number_format(floatval($q->premium_rate) * 100, 2) . '%' : null,
-                        'Currency'           => $q->currency->name ?? null,
-                        'Exchange Rate'      => $q->exchange_rate ?? null,
-                        'Commission Rate'    => $q->commission_rate ? $q->commission_rate . '%' : null,
-                        'Is Tax Exempted'    => ($q->is_tax_exempted === 'Y') ? 'Yes' : 'No',
+                        'Coverage'               => $q->coverage->name ?? null,
+                        'Risk Name'              => $q->coverage->risk_name ?? null,
+                        'Risk Code'              => $q->coverage->risk_code ?? null,
+                        'Product Code'           => $q->product_code ?? null,
+                        'Sum Insured'            => $sumInsured > 0 ? number_format($sumInsured, 2) : null,
+                        'Premium Rate'           => $q->premium_rate ? number_format(floatval($q->premium_rate) * 100, 2) . '%' : null,
+                        'Coverage Rate'          => ($q->coverage->rate ?? 0) > 0 ? number_format(floatval($q->coverage->rate) * 100, 2) . '%' : null,
+                        'Minimum Amount'         => ($q->coverage->minimum_amount ?? 0) > 0 ? number_format($q->coverage->minimum_amount, 2) : null,
+                        'Currency'               => $q->currency->name ?? null,
+                        'Exchange Rate'          => $q->exchange_rate ? number_format($q->exchange_rate, 2) : null,
+                        'Commission Rate'        => $q->commission_rate ? $q->commission_rate . '%' : null,
+                        'Is Tax Exempted'        => ($q->is_tax_exempted === 'Y') ? 'Yes' : 'No',
                     ], fn($v) => $v !== null && $v !== '' && $v !== '0.00' && $v !== '0');
                 @endphp
 

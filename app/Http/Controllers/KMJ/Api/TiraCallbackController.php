@@ -110,7 +110,11 @@ class TiraCallbackController extends Controller
 
                 $gen_data = generateXML('CoverNoteRefResAck', $ackData);
 
+                Log::info("GEN DATA: " .$gen_data);
+
                 $gen_data = TiraRequestCallBack($gen_data)['xml'];
+
+                
 
                 // ✅ Jibu XML (Response)
                 return response($gen_data, 200)

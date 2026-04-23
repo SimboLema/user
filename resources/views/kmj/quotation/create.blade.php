@@ -121,7 +121,7 @@
             background-color: rgba(13,110,253,0.05);
         }
 
-        /* ── Addon page styles (matching standalone addon page) ── */
+        /* ── Addon page styles ── */
         .addon-row-selected { background-color: #f1f8ff !important; }
         .addon-row-selected td { color: #003153 !important; }
         .addon-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: #003153; }
@@ -201,13 +201,10 @@
 
                                     @php
                                         $isMotor    = $coverage->product->insurance->id == 2;
-                                        // Motor steps:    Customer, Motor, Duration, Premium, Addons, Review, Payment, Finalize
-                                        // Non-Motor steps: Customer, Duration, Premium, Review, Payment, Finalize
                                         $stepLabels = $isMotor
                                             ? ['Customer','Motor','Duration','Premium','Addons','Review','Payment','Finalize']
                                             : ['Customer','Duration','Premium','Review','Payment','Finalize'];
                                         $totalSteps = count($stepLabels);
-                                        // 0-based index of Review step
                                         $reviewIdx  = $isMotor ? 5 : 3;
                                     @endphp
 
@@ -244,6 +241,27 @@
                                         <input type="hidden" id="customer_phone" name="customer_phone">
                                         <input type="hidden" id="customer_email" name="customer_email">
 
+                                        {{-- ── Hidden inputs for PDF preview (synced by calculate()) ── --}}
+                                        <input type="hidden" id="h_premium_rate"                name="premium_rate">
+                                        <input type="hidden" id="h_premium"                     name="premium">
+                                        <input type="hidden" id="h_tax_rate"                    name="tax_rate">
+                                        <input type="hidden" id="h_tax_amount"                  name="tax_amount">
+                                        <input type="hidden" id="h_total_premium_excluding_tax" name="total_premium_excluding_tax">
+                                        <input type="hidden" id="h_total_premium_including_tax" name="total_premium_including_tax">
+                                        <input type="hidden" id="h_cover_note_end_date"         name="cover_note_end_date">
+                                        <input type="hidden" id="h_coverage_name"               name="coverage_name"
+                                               value="{{ $coverage->name ?? '' }}">
+                                        <input type="hidden" id="h_coverage_rate"               name="coverage_rate"
+                                               value="{{ $coverage->rate ?? 0 }}">
+                                        <input type="hidden" id="h_product_name"                name="product_name"
+                                               value="{{ $coverage->product->name ?? '' }}">
+                                        <input type="hidden" id="h_insurance_type"              name="insurance_type"
+                                               value="{{ $coverage->product->insurance->type ?? '' }}">
+                                        <input type="hidden" id="h_insurance_name"              name="insurance_name"
+                                               value="{{ $coverage->product->insurance->name ?? '' }}">
+                                        <input type="hidden" id="h_insuarer_name"               name="insuarer_name"
+                                               value="{{ $coverage->product->insurance->name ?? 'KMJ Insurance Brokers Ltd' }}">
+
                                         {{-- ── STEP 1: Customer ── --}}
                                         @include('kmj.quotation.create.customer')
 
@@ -259,136 +277,149 @@
                                         @include('kmj.quotation.create.premium_calculation')
 
                                         @if ($isMotor)
-                                        {{-- ── STEP 5 (Motor only): Addons ── --}}
-                                        <div class="step-content d-none">
-                                            <h5 class="step-title">
-                                                <i class="bi bi-puzzle me-2"></i>Addons
-                                            </h5>
+{{-- ── STEP 5 (Motor only): Addons ── --}}
+<div class="step-content d-none">
+    <h5 class="step-title">
+        <i class="bi bi-puzzle me-2"></i>Addons
+    </h5>
 
-                                            <div class="row g-5 mt-1">
-                                                {{-- LEFT: Addon table --}}
-                                                <div class="col-lg-8">
-                                                    <div class="card">
-                                                        <div class="card-header card-header-stretch">
-                                                            <div class="card-title">
-                                                                <h3 class="m-0 text-gray-800">Available Addons</h3>
-                                                            </div>
-                                                            <div class="card-toolbar">
-                                                                <span class="badge badge-light-primary fs-7 fw-bold"
-                                                                      id="selected-count-inline">0 selected</span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="card-body p-0">
-                                                            <div class="table-responsive">
-                                                                <table class="table align-middle table-row-bordered table-row-solid gy-4 gs-9">
-                                                                    <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
-                                                                        <tr>
-                                                                            <th class="w-40px text-center"></th>
-                                                                            <th class="min-w-200px">Name &amp; Description</th>
-                                                                            <th class="min-w-100px text-center">Type</th>
-                                                                            <th class="min-w-150px text-end pe-6">Amount (excl. tax)</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        @forelse($addons ?? [] as $addon)
-                                                                            @php
-                                                                                if ($addon->amount_type === 'PREMIUM') {
-                                                                                    $calcAmt   = $addon->rate * ($coverage->minimum_amount ?? 0);
-                                                                                    $typeLabel = number_format($addon->rate * 100, 2) . '% of base';
-                                                                                } else {
-                                                                                    $calcAmt   = $addon->amount;
-                                                                                    $typeLabel = 'Flat amount';
-                                                                                }
-                                                                            @endphp
-                                                                            <tr class="text-gray-600 fs-6 fw-semibold addon-row"
-                                                                                id="addon-row-{{ $addon->id }}">
-                                                                                <td class="text-center">
-                                                                                    <input type="checkbox"
-                                                                                           class="addon-checkbox addon-step-checkbox"
-                                                                                           name="addon_ids[]"
-                                                                                           value="{{ $addon->id }}"
-                                                                                           data-name="{{ $addon->name }}"
-                                                                                           data-amount="{{ $calcAmt }}">
-                                                                                </td>
-                                                                                <td>
-                                                                                    <span class="text-gray-800 fw-bold d-block addon-name">{{ $addon->name }}</span>
-                                                                                    <span class="text-gray-500 fs-7">{{ Str::limit($addon->description, 90) }}</span>
-                                                                                </td>
-                                                                                <td class="text-center">
-                                                                                    @if($addon->amount_type === 'PREMIUM')
-                                                                                        <span class="badge-premium">PREMIUM</span>
-                                                                                    @else
-                                                                                        <span class="badge-normal">NORMAL</span>
-                                                                                    @endif
-                                                                                    <div class="text-gray-500 fs-8 mt-1">{{ $typeLabel }}</div>
-                                                                                </td>
-                                                                                <td class="text-end pe-6">
-                                                                                    <span class="text-gray-800 fw-bold fs-6">
-                                                                                        TZS {{ number_format($calcAmt, 2) }}
-                                                                                    </span>
-                                                                                </td>
-                                                                            </tr>
-                                                                        @empty
-                                                                            <tr>
-                                                                                <td colspan="4" class="text-center text-muted py-10">
-                                                                                    No addon products available.
-                                                                                </td>
-                                                                            </tr>
-                                                                        @endforelse
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+    <div class="row g-5 mt-1">
+        {{-- LEFT: Addon table --}}
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header card-header-stretch">
+                    <div class="card-title">
+                        <h3 class="m-0 text-gray-800">Available Addons</h3>
+                    </div>
+                    <div class="card-toolbar">
+                        <span class="badge badge-light-primary fs-7 fw-bold"
+                              id="selected-count-inline">0 selected</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-bordered table-row-solid gy-4 gs-9">
+                            <thead class="border-gray-200 fs-5 fw-semibold bg-lighten">
+                                <tr>
+                                    <th class="w-40px text-center"></th>
+                                    <th class="min-w-200px">Name &amp; Description</th>
+                                    <th class="min-w-100px text-center">Type</th>
+                                    <th class="min-w-150px text-end pe-6">Amount (excl. tax)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($addons ?? [] as $addon)
+                                    @php
+                                        
+                                        $isChecked = false;
 
-                                                {{-- RIGHT: Premium summary card --}}
-                                                <div class="col-lg-4">
-                                                    <div class="card summary-card-inline">
-                                                        <div class="card-header card-header-stretch">
-                                                            <div class="card-title">
-                                                                <h3 class="m-0 text-gray-800">Premium Summary</h3>
-                                                            </div>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="summary-line">
-                                                                <span class="text-gray-600 fw-semibold fs-6">Base Premium</span>
-                                                                <span class="text-gray-800 fw-bold fs-6" id="addon-base-premium">TZS 0.00</span>
-                                                            </div>
-                                                            <div class="summary-line">
-                                                                <span class="text-gray-600 fw-semibold fs-6">Addons Subtotal</span>
-                                                                <span class="text-primary fw-bold fs-6" id="addon-addons-total">TZS 0.00</span>
-                                                            </div>
-                                                            <div class="summary-line">
-                                                                <span class="text-gray-600 fw-semibold fs-6">Premium (excl. tax)</span>
-                                                                <span class="text-gray-800 fw-bold fs-6" id="addon-excl-tax">TZS 0.00</span>
-                                                            </div>
-                                                            <div class="summary-line">
-                                                                <span class="text-gray-600 fw-semibold fs-6">VAT (18%)</span>
-                                                                <span class="text-gray-800 fw-bold fs-6" id="addon-tax-amount">TZS 0.00</span>
-                                                            </div>
-                                                            <div class="summary-total mt-3">
-                                                                <span class="text-gray-800 fw-bolder fs-5">Total (incl. tax)</span>
-                                                                <span class="fw-bolder fs-3 text-primary" id="addon-grand-total">TZS 0.00</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>{{-- /row --}}
+                                        if ($addon->amount_type === 'PREMIUM') {
+                                            $initialAmt = $addon->rate * ($coverage->minimum_amount ?? 0);
+                                            $typeLabel  = number_format($addon->rate * 100, 2) . '% of base';
+                                        } else {
+                                            $initialAmt = $addon->amount;
+                                            $typeLabel  = 'Flat amount';
+                                        }
+                                    @endphp
+                                    {{--
+                                        IMPORTANT: id must match JS selector "addon-row-X"
+                                        data-rate is used by recalcAddons() for PREMIUM type
+                                        data-amount is kept for NORMAL type (static)
+                                        data-type lets JS know how to compute the amount
+                                    --}}
+                                    <tr class="text-gray-600 fs-6 fw-semibold addon-row"
+                                        id="addon-row-{{ $addon->id }}">
+                                        <td class="text-center">
+                                            <input type="checkbox"
+                                                   class="addon-checkbox addon-step-checkbox"
+                                                   name="addon_ids[]"
+                                                   value="{{ $addon->id }}"
+                                                   data-name="{{ $addon->name }}"
+                                                   data-type="{{ $addon->amount_type }}"
+                                                   data-rate="{{ $addon->rate ?? 0 }}"
+                                                   data-amount="{{ $initialAmt }}">
+                                        </td>
+                                        <td>
+                                            <span class="text-gray-800 fw-bold d-block addon-name">{{ $addon->name }}</span>
+                                            <span class="text-gray-500 fs-7">{{ Str::limit($addon->description, 90) }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($addon->amount_type === 'PREMIUM')
+                                                <span class="badge-premium">PREMIUM</span>
+                                            @else
+                                                <span class="badge-normal">NORMAL</span>
+                                            @endif
+                                            <div class="text-gray-500 fs-8 mt-1">{{ $typeLabel }}</div>
+                                        </td>
+                                        <td class="text-end pe-6">
+                                            {{-- This span is updated dynamically by JS for PREMIUM type --}}
+                                            <span class="text-gray-800 fw-bold fs-6 addon-display-amount"
+                                                  id="addon-amt-{{ $addon->id }}">
+                                                TZS {{ number_format($initialAmt, 2) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted py-10">
+                                            No addon products available.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                                            <div class="d-flex justify-content-between mt-4">
-                                                <button type="button" class="btn text-white"
-                                                        style="background-color:#9aa89b" onclick="changeStep(-1)">
-                                                    <i class="bi bi-arrow-left me-2"></i> Back
-                                                </button>
-                                                <button type="button" class="btn text-white"
-                                                        style="background-color:#003153" onclick="changeStep(1)">
-                                                    Next <i class="bi bi-arrow-right ms-2"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        {{-- /Addons step --}}
-                                        @endif
+        {{-- RIGHT: Premium summary card --}}
+        <div class="col-lg-4">
+            <div class="card summary-card-inline">
+                <div class="card-header card-header-stretch">
+                    <div class="card-title">
+                        <h3 class="m-0 text-gray-800">Premium Summary</h3>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="summary-line">
+                        <span class="text-gray-600 fw-semibold fs-6">Base Premium</span>
+                        <span class="text-gray-800 fw-bold fs-6" id="addon-base-premium">TZS 0.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span class="text-gray-600 fw-semibold fs-6">Addons Subtotal</span>
+                        <span class="text-primary fw-bold fs-6" id="addon-addons-total">TZS 0.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span class="text-gray-600 fw-semibold fs-6">Premium (excl. tax)</span>
+                        <span class="text-gray-800 fw-bold fs-6" id="addon-excl-tax">TZS 0.00</span>
+                    </div>
+                    <div class="summary-line">
+                        <span class="text-gray-600 fw-semibold fs-6">VAT (18%)</span>
+                        <span class="text-gray-800 fw-bold fs-6" id="addon-tax-amount">TZS 0.00</span>
+                    </div>
+                    <div class="summary-total mt-3">
+                        <span class="text-gray-800 fw-bolder fs-5">Total (incl. tax)</span>
+                        <span class="fw-bolder fs-3 text-primary" id="addon-grand-total">TZS 0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>{{-- /row --}}
+
+    <div class="d-flex justify-content-between mt-4">
+        <button type="button" class="btn text-white"
+                style="background-color:#9aa89b" onclick="changeStep(-1)">
+            <i class="bi bi-arrow-left me-2"></i> Back
+        </button>
+        <button type="button" class="btn text-white"
+                style="background-color:#003153" onclick="changeStep(1)">
+            Next <i class="bi bi-arrow-right ms-2"></i>
+        </button>
+    </div>
+</div>
+{{-- /Addons step --}}
+@endif
 
                                         {{-- ── STEP 6 (Motor) / 4 (non-Motor): Review ── --}}
                                         <div class="step-content d-none">
@@ -583,13 +614,13 @@
                                                 </div>
                                                 @endif
 
-                                                {{-- Print/Download --}}
+                                                {{-- Preview Button --}}
                                                 <div class="col-12 text-center">
                                                     <button type="button"
                                                             class="btn btn-outline-secondary px-4"
-                                                            onclick="window.print()"
+                                                            onclick="downloadQuotationPreview()"
                                                             style="border-color:#9aa89b;color:#9aa89b;">
-                                                        <i class="bi bi-printer me-2"></i>Print / Download Preview
+                                                        <i class="bi bi-eye me-2"></i>Preview Quotation
                                                     </button>
                                                 </div>
 
@@ -632,7 +663,7 @@
     <script>
         // ── Constants from PHP ─────────────────────────────────────────
         const IS_MOTOR   = {{ $isMotor ? 'true' : 'false' }};
-        const REVIEW_IDX = {{ $reviewIdx }}; // 0-based
+        const REVIEW_IDX = {{ $reviewIdx }};
 
         // ── Step navigation ────────────────────────────────────────────
         let currentStep    = 0;
@@ -665,7 +696,6 @@
             const idx = targetStep - 1;
             if (idx < 0 || idx >= stepContents.length) return;
 
-            // Populate review when landing on it
             if (idx === REVIEW_IDX && typeof populateReview === 'function') {
                 populateReview();
             }
@@ -679,13 +709,11 @@
             const nextIdx = currentStep + direction;
 
             if (direction > 0) {
-                // Skip Step 1 validation if existing customer already selected
                 if (currentStep === 0 && $('#customer_id').val() && parseInt($('#customer_id').val()) > 0) {
                     goToStep(nextIdx + 1);
                     return;
                 }
 
-                // Validate required fields in current panel
                 const panel = stepContents[currentStep];
                 const requiredFields = panel.querySelectorAll('[required]');
                 let allValid = true;
@@ -721,35 +749,56 @@
         function recalcAddons() {
             if (!IS_MOTOR) return;
 
+            // Current base premium from the live hidden input (set by calculate())
+            const basePremium = parseFloat(
+                document.getElementById('h_total_premium_excluding_tax')?.value || 0
+            );
+            const taxRate = parseFloat(
+                document.getElementById('h_tax_rate')?.value || 0.18
+            );
+
             let addonsTotal   = 0;
             let selectedCount = 0;
 
+            // First pass: update data-amount for PREMIUM type checkboxes
+            // so their dynamic value reflects the current basePremium
+            document.querySelectorAll('.addon-step-checkbox').forEach(cb => {
+                if (cb.dataset.type === 'PREMIUM') {
+                    const rate = parseFloat(cb.dataset.rate || 0);
+                    const dynamicAmt = rate * basePremium;
+
+                    // Update data-amount so it's correct when summed below
+                    cb.dataset.amount = dynamicAmt.toFixed(4);
+
+                    // Update the displayed amount in the table row
+                    const amtSpan = document.getElementById('addon-amt-' + cb.value);
+                    if (amtSpan) {
+                        amtSpan.textContent = fmtTZS(dynamicAmt);
+                    }
+                }
+            });
+
+            // Second pass: sum only checked ones
             document.querySelectorAll('.addon-step-checkbox:checked').forEach(cb => {
                 addonsTotal += parseFloat(cb.dataset.amount || 0);
                 selectedCount++;
             });
 
-            const basePremium = parseFloat(
-                document.querySelector('[name="total_premium_excluding_tax"]')?.value || 0
-            );
-            const taxRate  = parseFloat(
-                document.querySelector('[name="tax_rate"]')?.value || 0.18
-            );
-            const exclTax  = basePremium + addonsTotal;
-            const taxAmt   = exclTax * taxRate;
-            const inclTax  = exclTax + taxAmt;
+            const exclTax = basePremium + addonsTotal;
+            const taxAmt  = exclTax * taxRate;
+            const inclTax = exclTax + taxAmt;
 
             const el = id => document.getElementById(id);
-            if (el('addon-base-premium'))  el('addon-base-premium').textContent  = fmtTZS(basePremium);
-            if (el('addon-addons-total'))  el('addon-addons-total').textContent  = fmtTZS(addonsTotal);
-            if (el('addon-excl-tax'))      el('addon-excl-tax').textContent      = fmtTZS(exclTax);
-            if (el('addon-tax-amount'))    el('addon-tax-amount').textContent    = fmtTZS(taxAmt);
-            if (el('addon-grand-total'))   el('addon-grand-total').textContent   = fmtTZS(inclTax);
-            if (el('selected-count-inline')) {
-                el('selected-count-inline').textContent = selectedCount + ' selected';
-            }
+            if (el('addon-base-premium'))    el('addon-base-premium').textContent    = fmtTZS(basePremium);
+            if (el('addon-addons-total'))    el('addon-addons-total').textContent    = fmtTZS(addonsTotal);
+            if (el('addon-excl-tax'))        el('addon-excl-tax').textContent        = fmtTZS(exclTax);
+            if (el('addon-tax-amount'))      el('addon-tax-amount').textContent      = fmtTZS(taxAmt);
+            if (el('addon-grand-total'))     el('addon-grand-total').textContent     = fmtTZS(inclTax);
+            if (el('selected-count-inline')) el('selected-count-inline').textContent = selectedCount + ' selected';
         }
 
+        // Checkbox change: toggle highlight row + recalc
+        // Note: uses "addon-row-X" to match the fixed HTML id above
         document.querySelectorAll('.addon-step-checkbox').forEach(cb => {
             cb.addEventListener('change', function () {
                 const row = document.getElementById('addon-row-' + this.value);
@@ -758,16 +807,15 @@
             });
         });
 
+
         // ── Review population ──────────────────────────────────────────
         function populateReview() {
-            // Helper: get value of a named input/select
             const gv = name => {
                 const el = document.querySelector(`[name="${name}"]`);
                 if (!el) return '—';
                 return el.value || '—';
             };
 
-            // Helper: get display text of a select (not just value)
             const gt = name => {
                 const el = document.querySelector(`[name="${name}"]`);
                 if (!el) return '—';
@@ -789,7 +837,6 @@
             };
 
             // ── Customer ──
-            // Prefer hidden customer fields (existing customer) over typed fields
             const existingName  = document.getElementById('customer_name')?.value;
             const existingPhone = document.getElementById('customer_phone')?.value;
             const existingEmail = document.getElementById('customer_email')?.value;
@@ -805,7 +852,6 @@
             set('rv-postal',    gv('postal_address'));
 
             @if($isMotor)
-            // ── Motor / Vehicle ──
             set('rv-reg',     gv('registration_number'));
             set('rv-chassis', gv('chassis_number'));
             set('rv-make',    gv('make'));
@@ -818,21 +864,20 @@
 
             // ── Duration ──
             set('rv-start-date',    gv('cover_note_start_date'));
-            set('rv-end-date',      gv('cover_note_end_date'));
+            set('rv-end-date',      document.getElementById('h_cover_note_end_date')?.value || '—');
             set('rv-currency',      gt('currency_id'));
             set('rv-exchange-rate', gv('exchange_rate'));
 
-            // ── Premium ──
-            const premRate = parseFloat(gv('premium_rate'));
-            set('rv-sum-insured',   fmt(gv('sum_insured')));
-            set('rv-premium-rate',  isNaN(premRate) ? '—' : (premRate * 100).toFixed(2) + '%');
-            set('rv-excl-tax',      fmt(gv('total_premium_excluding_tax')));
-            set('rv-tax',           fmt(gv('tax_amount')));
-            set('rv-commission',    (gv('commission_rate') || '0') + '%');
-            set('rv-total',         fmt(gv('total_premium_including_tax')));
+            // ── Premium — read from hidden inputs (synced by calculate()) ──
+            const premRate = parseFloat(document.getElementById('h_premium_rate')?.value || 0);
+            set('rv-sum-insured',  fmt(gv('sum_insured')));
+            set('rv-premium-rate', isNaN(premRate) || premRate === 0 ? '—' : (premRate * 100).toFixed(2) + '%');
+            set('rv-excl-tax',     fmt(document.getElementById('h_total_premium_excluding_tax')?.value));
+            set('rv-tax',          fmt(document.getElementById('h_tax_amount')?.value));
+            set('rv-commission',   (gv('commission_rate') || '0') + '%');
+            set('rv-total',        fmt(document.getElementById('h_total_premium_including_tax')?.value));
 
             @if($isMotor)
-            // ── Addons ──
             const checked  = document.querySelectorAll('.addon-step-checkbox:checked');
             const rvAddons = document.getElementById('rv-addons');
             if (rvAddons) {
@@ -911,6 +956,7 @@
             const startDateInput = document.getElementById('cover_note_start_date');
             const durationSelect = document.getElementById('cover_note_duration_id');
             const endDateInput   = document.getElementById('cover_note_end_date');
+            const hEndDate       = document.getElementById('h_cover_note_end_date');
 
             const today = new Date();
             const pad   = n => String(n).padStart(2, '0');
@@ -925,9 +971,13 @@
                     const end = new Date(startDate);
                     end.setMonth(end.getMonth() + months);
                     end.setDate(end.getDate() - 1);
-                    endDateInput.value = `${end.getFullYear()}-${pad(end.getMonth()+1)}-${pad(end.getDate())}`;
+                    const endStr = `${end.getFullYear()}-${pad(end.getMonth()+1)}-${pad(end.getDate())}`;
+                    if (endDateInput) endDateInput.value = endStr;
+                    // ── Sync to hidden input for preview ──
+                    if (hEndDate) hEndDate.value = endStr;
                 } else {
-                    endDateInput.value = '';
+                    if (endDateInput) endDateInput.value = '';
+                    if (hEndDate)     hEndDate.value     = '';
                 }
             }
 
@@ -940,46 +990,72 @@
     {{-- ── Premium calculation ── --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const sumInsuredInput               = document.querySelector('input[name="sum_insured"]');
+            const sumInsuredInput    = document.querySelector('input[name="sum_insured"]');
+            const commissionRateInput = document.querySelector('input[name="commission_rate"]');
+            const taxExemptSelect    = document.getElementById('is_tax_exempted');
+
+            // Visible inputs that may exist in premium_calculation partial
             const premiumInput                  = document.querySelector('input[name="premium"]');
             const premiumRateInput              = document.querySelector('input[name="premium_rate"]');
             const taxRateInput                  = document.querySelector('input[name="tax_rate"]');
             const taxAmountInput                = document.querySelector('input[name="tax_amount"]');
             const totalPremiumIncludingTaxInput = document.querySelector('input[name="total_premium_including_tax"]');
             const totalPremiumExcludingTaxInput = document.querySelector('input[name="total_premium_excluding_tax"]');
-            const commissionRateInput           = document.querySelector('input[name="commission_rate"]');
             const commissionPaidInput           = document.querySelector('input[name="commission_paid"]');
-            const taxExemptSelect               = document.getElementById('is_tax_exempted');
+
+            // Hidden inputs for preview POST
+            const hPremiumRate   = document.getElementById('h_premium_rate');
+            const hPremium       = document.getElementById('h_premium');
+            const hTaxRate       = document.getElementById('h_tax_rate');
+            const hTaxAmount     = document.getElementById('h_tax_amount');
+            const hExclTax       = document.getElementById('h_total_premium_excluding_tax');
+            const hInclTax       = document.getElementById('h_total_premium_including_tax');
 
             const coverageRate   = {{ $coverage->rate }};
             const minimumAmount  = {{ $coverage->minimum_amount }};
             const defaultTaxRate = 0.18;
 
+            function syncHidden(el, value) {
+                if (el) el.value = value;
+            }
+
             function calculate() {
-                const sumInsured    = parseFloat(sumInsuredInput.value) || 0;
-                const isTaxExempted = taxExemptSelect.value === 'Y';
+                const sumInsured    = parseFloat(sumInsuredInput?.value) || 0;
+                const isTaxExempted = taxExemptSelect?.value === 'Y';
                 const premiumRate   = coverageRate / 100;
                 const premium       = sumInsured * premiumRate;
                 const totalExTax    = premium > minimumAmount ? premium : minimumAmount;
                 const taxAmount     = isTaxExempted ? 0 : totalExTax * defaultTaxRate;
                 const totalIncTax   = totalExTax + taxAmount;
+                const commissionRate = parseFloat(commissionRateInput?.value) || 0;
+                const commissionPaid = (totalExTax * commissionRate) / 100;
 
-                premiumRateInput.value              = premiumRate.toFixed(4);
-                premiumInput.value                  = premium.toFixed(2);
-                taxRateInput.value                  = (isTaxExempted ? 0 : defaultTaxRate).toFixed(2);
-                taxAmountInput.value                = taxAmount.toFixed(2);
-                totalPremiumExcludingTaxInput.value = totalExTax.toFixed(2);
-                totalPremiumIncludingTaxInput.value = totalIncTax.toFixed(2);
+                // ── Update visible inputs (from premium_calculation partial) ──
+                syncHidden(premiumRateInput,              premiumRate.toFixed(4));
+                syncHidden(premiumInput,                  premium.toFixed(2));
+                syncHidden(taxRateInput,                  (isTaxExempted ? 0 : defaultTaxRate).toFixed(2));
+                syncHidden(taxAmountInput,                taxAmount.toFixed(2));
+                syncHidden(totalPremiumExcludingTaxInput, totalExTax.toFixed(2));
+                syncHidden(totalPremiumIncludingTaxInput, totalIncTax.toFixed(2));
+                syncHidden(commissionPaidInput,           commissionPaid.toFixed(2));
 
-                const commissionRate = parseFloat(commissionRateInput.value) || 0;
-                commissionPaidInput.value = ((totalExTax * commissionRate) / 100).toFixed(2);
+                // ── Sync to hidden inputs for preview POST ──
+                syncHidden(hPremiumRate, premiumRate.toFixed(4));
+                syncHidden(hPremium,     premium.toFixed(2));
+                syncHidden(hTaxRate,     (isTaxExempted ? 0 : defaultTaxRate).toFixed(2));
+                syncHidden(hTaxAmount,   taxAmount.toFixed(2));
+                syncHidden(hExclTax,     totalExTax.toFixed(2));
+                syncHidden(hInclTax,     totalIncTax.toFixed(2));
 
                 recalcAddons();
             }
 
-            sumInsuredInput.addEventListener('input', calculate);
-            taxExemptSelect.addEventListener('change', calculate);
-            commissionRateInput.addEventListener('input', calculate);
+            if (sumInsuredInput)    sumInsuredInput.addEventListener('input', calculate);
+            if (taxExemptSelect)    taxExemptSelect.addEventListener('change', calculate);
+            if (commissionRateInput) commissionRateInput.addEventListener('input', calculate);
+
+            // Run on load so hidden inputs are populated immediately
+            calculate();
         });
     </script>
 
@@ -991,12 +1067,131 @@
             const chequeFields  = document.getElementById('cheque-fields');
             const eftFields     = document.getElementById('eft-fields');
 
-            paymentSelect.addEventListener('change', function () {
-                [cashFields, chequeFields, eftFields].forEach(d => d.classList.add('d-none'));
-                if (this.value === '1')      cashFields.classList.remove('d-none');
-                else if (this.value === '2') chequeFields.classList.remove('d-none');
-                else if (this.value === '3') eftFields.classList.remove('d-none');
+            if (paymentSelect) {
+                paymentSelect.addEventListener('change', function () {
+                    [cashFields, chequeFields, eftFields].forEach(d => { if(d) d.classList.add('d-none'); });
+                    if (this.value === '1' && cashFields)        cashFields.classList.remove('d-none');
+                    else if (this.value === '2' && chequeFields) chequeFields.classList.remove('d-none');
+                    else if (this.value === '3' && eftFields)    eftFields.classList.remove('d-none');
+                });
+            }
+        });
+    </script>
+
+    {{-- ── PDF Preview Side Panel ── --}}
+    <div id="pdf-preview-overlay"
+         style="display:none;position:fixed;top:0;right:0;width:100%;height:100%;z-index:9999;background:rgba(0,0,0,0.5);">
+
+        <div id="pdf-preview-panel"
+             style="position:absolute;top:0;right:0;width:55%;height:100%;background:#fff;
+                    box-shadow:-4px 0 20px rgba(0,0,0,0.3);display:flex;flex-direction:column;">
+
+            {{-- Panel Header --}}
+            <div style="display:flex;justify-content:space-between;align-items:center;
+                        padding:12px 16px;background:#003153;color:#fff;flex-shrink:0;">
+                <span style="font-weight:600;font-size:14px;">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>Quotation Preview
+                </span>
+                <div style="display:flex;gap:8px;">
+                    <button type="button" onclick="downloadFromPreview()"
+                            style="background:#9aa89b;border:none;color:#fff;padding:5px 14px;
+                                   border-radius:4px;font-size:13px;cursor:pointer;">
+                        <i class="bi bi-download me-1"></i>Download
+                    </button>
+                    <button type="button" onclick="closePdfPreview()"
+                            style="background:transparent;border:1px solid rgba(255,255,255,0.4);
+                                   color:#fff;padding:5px 12px;border-radius:4px;font-size:13px;cursor:pointer;">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            {{-- Loading indicator --}}
+            <div id="pdf-loading"
+                 style="flex:1;display:flex;flex-direction:column;align-items:center;
+                        justify-content:center;gap:12px;color:#555;">
+                <div class="spinner-border" style="color:#003153;" role="status"></div>
+                <span style="font-size:13px;">Generating preview...</span>
+            </div>
+
+            {{-- iFrame --}}
+            <iframe id="pdf-preview-iframe"
+                    style="flex:1;border:none;display:none;"
+                    src="about:blank">
+            </iframe>
+        </div>
+    </div>
+
+    {{-- ── Preview Script (single, clean, no duplicate function) ── --}}
+    <script>
+        let pdfBlobUrl = null;
+
+        function downloadQuotationPreview() {
+            const form = document.querySelector('form[action="{{ route('kmj.quotation.store') }}"]');
+
+            if (!form) {
+                alert('Form not found!');
+                return;
+            }
+
+            // Show overlay & loading
+            document.getElementById('pdf-preview-overlay').style.display = 'block';
+            document.getElementById('pdf-loading').style.display          = 'flex';
+            document.getElementById('pdf-preview-iframe').style.display   = 'none';
+
+            if (pdfBlobUrl) {
+                window.URL.revokeObjectURL(pdfBlobUrl);
+                pdfBlobUrl = null;
+            }
+
+            // FormData picks up all inputs including our hidden ones
+            const formData = new FormData(form);
+
+            fetch('{{ route("kmj.quotation.preview.download") }}', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: formData,
+            })
+            .then(res => {
+                if (!res.ok) return res.text().then(t => { throw new Error(t) });
+                return res.blob();
+            })
+            .then(blob => {
+                pdfBlobUrl = window.URL.createObjectURL(blob);
+                const iframe = document.getElementById('pdf-preview-iframe');
+                iframe.src = pdfBlobUrl;
+                document.getElementById('pdf-loading').style.display        = 'none';
+                document.getElementById('pdf-preview-iframe').style.display = 'block';
+            })
+            .catch(err => {
+                closePdfPreview();
+                console.error(err);
+                alert('Could not generate preview:\n' + err.message);
             });
+        }
+
+        function downloadFromPreview() {
+            if (!pdfBlobUrl) return;
+            const a   = document.createElement('a');
+            a.href     = pdfBlobUrl;
+            a.download = 'Quotation-Preview.pdf';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+
+        function closePdfPreview() {
+            document.getElementById('pdf-preview-overlay').style.display = 'none';
+            document.getElementById('pdf-preview-iframe').src = 'about:blank';
+            if (pdfBlobUrl) {
+                window.URL.revokeObjectURL(pdfBlobUrl);
+                pdfBlobUrl = null;
+            }
+        }
+
+        // Close on overlay background click
+        document.getElementById('pdf-preview-overlay').addEventListener('click', function (e) {
+            if (e.target === this) closePdfPreview();
         });
     </script>
 

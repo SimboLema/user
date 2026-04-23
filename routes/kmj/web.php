@@ -78,6 +78,7 @@ Route::middleware(['auth'])->group(function () {
 
             Route::get('/{id}/download/covernote', [QuotationController::class, 'downloadCoverNote'])->name('kmj.quotation.download.covernote');
             Route::get('/{id}/download/quotation', [QuotationController::class, 'downloadQuotation'])->name('kmj.quotation.download.quotation');
+            Route::post('/preview/quotation/download', [QuotationController::class, 'previewQuotation'])->name('kmj.quotation.preview.download');
             Route::get('/{id}/download/payment/receipt', [QuotationController::class, 'downloadPayment'])->name('kmj.quotation.download.payment');
 
 

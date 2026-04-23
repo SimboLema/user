@@ -30,7 +30,7 @@ class ApiTiraController extends Controller
     private string $baseUrl;
     public function __construct()
     {
-        $this->baseUrl = 'http://192.168.168.200';
+        $this->baseUrl = 'https://192.168.168.200:8091';
     }
 
     public function motorPremiumCalculation(Request $request)

@@ -175,6 +175,10 @@ class QuotationController extends Controller
         $motorUsages = MotorUsage::all();
         $ownerCategories = OwnerCategory::all();
 
+        //addon
+        $addons = AddonProduct::all();
+
+
 
         return view('kmj.quotation.create', compact(
             'regions',
@@ -189,7 +193,7 @@ class QuotationController extends Controller
             'motorTypes',
             'motorUsages',
             'ownerCategories',
-            'countries','insuarerId'
+            'countries','insuarerId','addons'
         ));
     }
 
@@ -813,11 +817,180 @@ public function saveAddons(Request $request, $id)
     }
 
 
+    public function previewQuotation(Request $request)
+{
+    // ── Build a temporary quotation object from raw form data ──
+    // We read values exactly as downloadQuotation reads them from the DB
+    $q = new \stdClass();
+
+    $q->id                          = 'PREVIEW';
+    $q->control_number              = $request->input('control_number', '—');
+    $q->created_at                  = now();
+    $q->cover_note_start_date       = $request->input('cover_note_start_date')
+                                        ? \Carbon\Carbon::parse($request->input('cover_note_start_date'))
+                                        : null;
+    $q->cover_note_end_date         = $request->input('cover_note_end_date')
+                                        ? \Carbon\Carbon::parse($request->input('cover_note_end_date'))
+                                        : null;
+    $q->insurance_id                = $request->input('insurance_id', 0);
+    $q->fleet_id                    = null;
+
+    // ── Financial values — read directly from form (already calculated by JS) ──
+    $q->sum_insured                         = floatval($request->input('sum_insured', 0));
+    $q->premium_rate                        = floatval($request->input('premium_rate', 0)); // already decimal from JS
+    $q->discount                            = floatval($request->input('discount', 0));
+    $q->tax_rate                            = floatval($request->input('tax_rate', 0.18));
+    $q->is_tax_exempted                     = $request->input('is_tax_exempted', 'N');
+    $q->exchange_rate                       = floatval($request->input('exchange_rate', 1));
+    $q->tax_amount                          = floatval($request->input('tax_amount', 0));
+    $q->total_premium_excluding_tax         = floatval($request->input('total_premium_excluding_tax', 0));
+    $q->total_premium_including_tax         = floatval($request->input('total_premium_including_tax', 0));
+    $q->commission_rate                     = $request->input('commission_rate', 0);
+
+    // Derived fields — mirror exactly what downloadQuotation reads from DB columns
+    $q->premium_before_discount             = floatval($request->input('premium', 0)); // raw premium before discount
+    $q->premium_after_discount              = $q->total_premium_excluding_tax;
+    $q->premium_excluding_tax_equivalent    = $q->exchange_rate > 0
+                                                ? $q->total_premium_excluding_tax / $q->exchange_rate
+                                                : $q->total_premium_excluding_tax;
+    $q->premium_including_tax               = $q->exchange_rate > 0
+                                                ? $q->total_premium_including_tax / $q->exchange_rate
+                                                : $q->total_premium_including_tax;
+
+    // Other fields
+    $q->risk_code                           = $request->input('risk_code');
+    $q->product_code                        = $request->input('product_code');
+    $q->cover_note_desc                     = $request->input('cover_note_desc');
+    $q->operative_clause                    = $request->input('operative_clause');
+    $q->cover_note_reference                = $request->input('cover_note_reference');
+    $q->sticker_number                      = $request->input('sticker_number');
+    $q->acknowledgement_status_code         = '';
+    $q->acknowledgement_status_desc         = '';
+    $q->response_status_code                = '';
+    $q->response_status_desc               = '';
+    $q->request_id                          = '';
+
+    // ── Customer ──
+    $customer                   = new \stdClass();
+    $customer->name             = $request->input('customer_name');
+    $customer->postal_address   = $request->input('postal_address');
+    $customer->street           = $request->input('street');
+    $customer->phone            = $request->input('customer_phone') ?: $request->input('phone');
+    $customer->tin_number       = $request->input('tin_number');
+    $customer->vrn              = $request->input('vrn');
+    $customer->district         = null;
+    $customer->region           = null;
+    $q->customer                = $customer;
+    $q->customer_name           = $customer->name;
+
+    // ── Coverage / Product / Insurance ──
+    $insurance              = new \stdClass();
+    $insurance->name        = $request->input('insurance_name', 'KMJ Insurance Brokers Ltd');
+    $insurance->type        = $request->input('insurance_type', '');
+    $insurance->id          = $request->input('insurance_id', 0);
+    $insurance->insurance_id = $request->input('insurance_id', 0);
+
+    $product                = new \stdClass();
+    $product->name          = $request->input('product_name', '—');
+    $product->insurance     = $insurance;
+    $product->insurance_id  = $request->input('insurance_id', 0);
+
+    $coverage               = new \stdClass();
+    $coverage->name         = $request->input('coverage_name', '—');
+    $coverage->risk_name    = $request->input('coverage_name', '—');
+    $coverage->risk_code    = $request->input('risk_code');
+    $coverage->rate         = floatval($request->input('coverage_rate', 0));
+    $coverage->product      = $product;
+    $q->coverage            = $coverage;
+
+    // ── Insurer ──
+    $insuarer               = new \stdClass();
+    $insuarer->name         = $request->input('insuarer_name', 'KMJ Insurance Brokers Ltd');
+    $q->insuarer            = $insuarer;
+
+    // ── Motor ──
+    $q->motor = null;
+    if (intval($q->insurance_id) === 2 || $request->filled('registration_number')) {
+        $motor                          = new \stdClass();
+        $motor->registration_number     = $request->input('registration_number');
+        $motor->make                    = $request->input('make');
+        $motor->model                   = $request->input('model');
+        $motor->chassis_number          = $request->input('chassis_number');
+        $motor->body_type               = $request->input('body_type');
+        $motor->color                   = $request->input('color');
+        $motor->year_of_manufacture     = $request->input('year_of_manufacture');
+        $q->motor = $motor;
+    }
+
+    // ── Addons ──
+    $q->quotationAddons = collect(
+        array_map(function ($addon) {
+            $obj                    = new \stdClass();
+            $addonProduct           = new \stdClass();
+            $addonProduct->name     = $addon['name'] ?? 'Addon';
+            $obj->addonProduct      = $addonProduct;
+            $obj->amount            = floatval($addon['amount'] ?? 0);
+            $obj->addon_product_id  = $addon['id'] ?? null;
+            return $obj;
+        }, $request->input('addons', []))
+    );
+
+    // ── Build $quotationDetails — IDENTICAL structure to downloadQuotation ──
+    $quotation = $q;
+
+    $quotationDetails = [
+        'Customer Name'         => ucwords(strtolower($quotation->customer->name ?? '')),
+        'Product'               => ucwords(strtolower($quotation->coverage->product->name ?? '')),
+        'Coverage'              => ucwords(strtolower($quotation->coverage->risk_name ?? '')),
+        'Insurer Name'          => ucwords(strtolower($quotation->insuarer->name ?? '')),
+        'Intermediary'          => 'KMJ Insurance Brokers Ltd',
+        'Cover Note Start Date' => optional($quotation->cover_note_start_date)->format('d M Y'),
+        'Cover Note End Date'   => optional($quotation->cover_note_end_date)->format('d M Y'),
+        'Exchange Rate'         => number_format($quotation->exchange_rate ?? 0, 2),
+        'Total Premium (Excl. Tax)' => number_format($quotation->total_premium_excluding_tax ?? 0, 2),
+        'Total Premium (Incl. Tax)' => number_format($quotation->total_premium_including_tax ?? 0, 2),
+    ];
+
+    // Additional financial details — same block as downloadQuotation (fleet_id is null so always runs)
+    $quotationDetails['Sum Insured']                        = number_format($quotation->sum_insured ?? 0, 2);
+    $quotationDetails['Premium Rate (%)']                   = number_format(($quotation->premium_rate ?? 0) * 100, 2);
+    $quotationDetails['Premium Before Discount']            = number_format($quotation->premium_before_discount ?? 0, 2);
+    $quotationDetails['Premium After Discount']             = number_format($quotation->premium_after_discount ?? 0, 2);
+    $quotationDetails['Premium Excl. Tax (Equivalent)']     = number_format($quotation->premium_excluding_tax_equivalent ?? 0, 2);
+    $quotationDetails['Premium Incl. Tax']                  = number_format($quotation->premium_including_tax ?? 0, 2);
+    $quotationDetails['Tax Rate (%)']                       = number_format(($quotation->tax_rate ?? 0) * 100, 2);
+    $quotationDetails['Tax Amount']                         = number_format($quotation->tax_amount ?? 0, 2);
+
+    if (intval($quotation->insurance_id) === 2) {
+        $quotationDetails['Sticker Number'] = $quotation->sticker_number ?? '';
+    }
+
+    $quotationDetails['Cover Note Reference']                   = $quotation->cover_note_reference ?? '';
+    $quotationDetails['Acknowledgement Status Code']            = '';
+    $quotationDetails['Acknowledgement Status Description']     = '';
+    $quotationDetails['Response Status Code']                   = '';
+    $quotationDetails['Response Status Description']            = '';
+    $quotationDetails['Request ID']                             = '';
+
+
+
+    // ── Render — stream instead of download so it shows in the iframe ──
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+        'kmj.quotation.downloads.quotation_pdf',
+        compact('quotation', 'quotationDetails')
+    )->setPaper('a4', 'portrait');
+
+    return $pdf->stream('Quotation-Preview.pdf'); // stream = shows in iframe, not forced download
+}
+
+
     public function downloadQuotation($id)
     {
     $quotation = Quotation::with([
         'customer',
+        'coverage',
         'coverage.product',
+        'coverage.product.insurance',
         'insuarer'
     ])->find($id);
 
