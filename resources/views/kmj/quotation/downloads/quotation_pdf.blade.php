@@ -27,23 +27,20 @@
 
         .content { padding: 0 20px; }
 
-        /* ── Prevent splits ── */
         .quotation-header-table,
         .info-table,
-        .fin-table,
         .bank-split-table,
         .issued-by-table,
         .declaration-block,
         .section-with-bar,
         .motor-items-table,
-        .totals-table-motor {
+        .nonmotor-items-table,
+        .totals-table {
             page-break-inside: avoid;
             break-inside: avoid;
         }
 
-        /* ══════════════════════════════════════════════
-           SHARED — Quotation header strip
-        ══════════════════════════════════════════════ */
+        /* ── Quotation header strip ── */
         .quotation-header-table {
             width: 100%;
             border-collapse: collapse;
@@ -76,9 +73,7 @@
             font-weight: bold;
         }
 
-        /* ══════════════════════════════════════════════
-           SHARED — Info rows (client, policy)
-        ══════════════════════════════════════════════ */
+        /* ── Info table ── */
         .info-table {
             width: 100%;
             border-collapse: collapse;
@@ -98,9 +93,7 @@
         }
         .field-value { font-size: 10px; color: #111; }
 
-        /* ══════════════════════════════════════════════
-           SHARED — Section heading bar
-        ══════════════════════════════════════════════ */
+        /* ── Section bar ── */
         .section-bar {
             background: #1a3a5c;
             color: #fff;
@@ -112,51 +105,35 @@
             break-after: avoid;
         }
 
-        /* ══════════════════════════════════════════════
-           NON-MOTOR — line-item detail rows
-        ══════════════════════════════════════════════ */
-        .detail-col-header { width: 100%; border-collapse: collapse; }
-        .detail-col-header td {
-            background: #e8e8e8;
-            border: 1px solid #bbb;
-            border-top: none;
-            padding: 3px 8px;
-            font-weight: bold;
-            font-size: 8.5px;
-            text-transform: uppercase;
-            color: #555;
-        }
-        .detail-line {
+        /* ── Covering Details ── */
+        .covering-table {
             width: 100%;
             border-collapse: collapse;
-            border-left: 1px solid #ccc;
-            border-right: 1px solid #ccc;
-            border-bottom: 1px dotted #ccc;
-            page-break-inside: avoid;
-            break-inside: avoid;
+            margin-bottom: 5px;
         }
-        .detail-line td { padding: 5px 8px; vertical-align: top; font-size: 9.5px; }
-        .detail-line.even td { background: #f7f7f7; }
-        .dl-label { width: 65%; font-weight: bold; color: #1a1a1a; }
-        .dl-value { width: 35%; text-align: right; white-space: nowrap; color: #111; }
-        .detail-lines-wrapper { border-bottom: 1px solid #ccc; }
+        .covering-table .covering-header {
+            background: #1a3a5c;
+            color: #fff;
+            font-weight: bold;
+            font-size: 9.5px;
+            padding: 5px 8px;
+            border: 1px solid #1a3a5c;
+            width: 50%;
+        }
+        .covering-table .covering-cell {
+            border: 1px solid #555;
+            padding: 6px 8px;
+            vertical-align: top;
+            font-size: 9px;
+            color: #444;
+            line-height: 1.6;
+            width: 50%;
+        }
 
-        /* ══════════════════════════════════════════════
-           NON-MOTOR — financial summary
-        ══════════════════════════════════════════════ */
-        .fin-table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        .fin-table td { border: 1px solid #555; padding: 5px 10px; }
-        .fin-table .fin-label { text-align: right; font-weight: bold; font-size: 10px; width: 75%; }
-        .fin-table .fin-value { text-align: right; font-size: 10px; white-space: nowrap; }
-        .fin-table .fin-total td { font-weight: bold; font-size: 11px; background: #f0f4f8; }
-
-        /* ══════════════════════════════════════════════
-           MOTOR — main items table
-        ══════════════════════════════════════════════ */
+        /* ── Motor items table ── */
         .motor-items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 0;
         }
         .motor-items-table th {
             border: 1px solid #1a3a5c;
@@ -175,9 +152,6 @@
             vertical-align: top;
         }
         .motor-items-table td.tr { text-align: right; }
-        .motor-items-table td.tc { text-align: center; }
-
-        /* Comprehensive sub-heading row */
         .motor-items-table .comp-row td {
             font-weight: bold;
             background: #f0f4f8;
@@ -185,27 +159,55 @@
             color: #1a3a5c;
             padding: 3px 7px;
         }
-
-        /* Dotted addon section inside the table */
         .addon-dotted {
             border-top: 1px dashed #777;
             border-bottom: 1px dashed #777;
-            padding: 3px 7px;
+            padding: 4px 7px;
             font-size: 9px;
-            line-height: 1.75;
+            line-height: 1.85;
             color: #222;
         }
-        .addon-dotted-row td { padding: 0 !important; border-left: 1px solid #ccc; border-right: 1px solid #ccc; }
+        .addon-dotted-row td {
+            padding: 0 !important;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-top: none;
+            border-bottom: none;
+        }
 
-        /* ══════════════════════════════════════════════
-           MOTOR — totals block
-        ══════════════════════════════════════════════ */
-        .totals-table-motor {
+        /* ── Non-motor items table ── */
+        .nonmotor-items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .nonmotor-items-table th {
+            border: 1px solid #1a3a5c;
+            padding: 5px 8px;
+            background: #e8e8e8;
+            font-size: 9.5px;
+            font-weight: bold;
+            text-align: left;
+            color: #222;
+        }
+        .nonmotor-items-table th.tr { text-align: right; }
+        .nonmotor-items-table td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            font-size: 9.5px;
+            vertical-align: top;
+        }
+        .nonmotor-items-table td.tr { text-align: right; }
+        .nonmotor-items-table .item-desc { font-weight: bold; color: #1a1a1a; margin-bottom: 3px; }
+        .nonmotor-items-table .item-subdesc { font-size: 8.5px; color: #555; line-height: 1.5; font-style: italic; }
+        .nonmotor-items-table tr.even td { background: #f7f7f7; }
+
+        /* ── Totals ── */
+        .totals-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 1px;
         }
-        .totals-table-motor td {
+        .totals-table td {
             border: 1px solid #555;
             padding: 4px 10px;
             font-size: 10px;
@@ -214,7 +216,6 @@
         .tt-value { text-align: right; font-weight: bold; }
         .tt-total td { font-weight: bold; font-size: 11px; background: #f0f4f8; }
 
-        /* Amount in words */
         .amount-words {
             border: 1px solid #555;
             border-top: none;
@@ -224,7 +225,6 @@
             color: #333;
         }
 
-        /* Bank / Digital row */
         .bank-footer-row {
             width: 100%;
             border-collapse: collapse;
@@ -238,16 +238,11 @@
             width: 50%;
         }
 
-        /* ══════════════════════════════════════════════
-           SHARED — Bank details (page 2)
-        ══════════════════════════════════════════════ */
+        /* ── Bank details ── */
         .bank-split-table { width: 100%; border-collapse: collapse; }
-        .bank-block { margin-bottom: 6px; font-size: 9.5px; line-height: 1.6; page-break-inside: avoid; break-inside: avoid; }
-        .bank-block strong { font-size: 9.5px; }
+        .bank-block { margin-bottom: 8px; font-size: 9.5px; line-height: 1.6; page-break-inside: avoid; break-inside: avoid; }
 
-        /* ══════════════════════════════════════════════
-           SHARED — Declaration
-        ══════════════════════════════════════════════ */
+        /* ── Declaration ── */
         .declaration-block {
             border: 1px solid #555;
             border-top: none;
@@ -256,37 +251,31 @@
             line-height: 1.9;
         }
 
-        /* ══════════════════════════════════════════════
-           SHARED — Footer
-        ══════════════════════════════════════════════ */
+        /* ── Footer ── */
         .footer { margin: 6px 20px 0 20px; font-size: 8px; color: #888; border-top: 1px solid #ddd; padding-top: 4px; }
         .footer-inner { width: 100%; border-collapse: collapse; }
         .footer-inner td { font-size: 8px; color: #888; }
-
         .suretech-logo { padding: 4px 20px 0 20px; font-size: 9px; color: #1a3a5c; font-weight: bold; letter-spacing: 1px; }
         .suretech-logo span.sys { font-weight: normal; font-size: 7.5px; letter-spacing: 2px; display: block; color: #888; }
-
-        /* ══════════════════════════════════════════════
-           NON-MOTOR only extras
-        ══════════════════════════════════════════════ */
-        .covering-table { width: 100%; border-collapse: collapse; margin-bottom: 5px; }
-        .covering-table td { border: 1px solid #555; padding: 6px 8px; vertical-align: top; font-size: 9.5px; }
     </style>
 </head>
 <body>
 
 @php
-    $q         = $quotation;
-    $customer  = $q->customer;
-    $motor     = $q->motor ?? null;
-    $isMotor   = intval($q->insurance_id) === 2 || !is_null($motor);
+    $q        = $quotation;
+    $customer = $q->customer;
+
+    // $motor is passed explicitly from the controller as a stdClass or null
+    // $isMotor: true if motor object exists OR registration_number is on the quotation
+    $isMotor  = !is_null($motor) || !empty($q->registration_number);
+
     $addons    = $q->quotationAddons ?? collect();
     $hasAddons = $isMotor && $addons->count() > 0;
 
     $issueDate = \Carbon\Carbon::parse($q->created_at)->format('d-M-Y');
     $startDate = $q->cover_note_start_date
         ? \Carbon\Carbon::parse($q->cover_note_start_date)->format('d-M-Y') : '—';
-    $endDate   = $q->cover_note_end_date
+    $endDate = $q->cover_note_end_date
         ? \Carbon\Carbon::parse($q->cover_note_end_date)->format('d-M-Y') : '—';
     $printDate = now()->format('n/j/Y g:i:sA');
     $printedBy = auth()->user()->name ?? 'KMJ Insurance';
@@ -296,22 +285,25 @@
     $vat             = floatval($q->tax_amount ?? 0);
     $totalReceivable = floatval($q->total_premium_including_tax ?? 0);
     $sumInsured      = floatval($q->sum_insured ?? 0);
-    $taxRate         = floatval($q->tax_rate ?? 0.18);
 
-    // Total pages: motor = 2, non-motor = 3
-    $totalPages = $isMotor ? 2 : 3;
+    $totalPages  = $isMotor ? 2 : 3;
 
-    // Address
     $addressParts = array_filter([
         $customer->postal_address ?? null,
         $customer->street ?? null,
         $customer->district->name ?? null,
-        $customer->region->name ?? null,
     ]);
     $address = implode(",\n", $addressParts);
 
-    // Insurer name
-    $insurerName = $q->coverage->product->insurance->name ?? ($q->insuarer->name ?? 'KMJ Insurance Brokers Ltd');
+    $insurerName = $q->insuarer->name ?? $q->coverage->product->insurance->name ?? 'KMJ Insurance Brokers Ltd';
+
+    $coveringDetails   = $q->cover_note_desc ?? ($isMotor
+        ? 'COMPREHENSIVE MOTOR VEHICLE INSURANCE POLICY COVERING THE INSURED VEHICLE AGAINST LOSS OR DAMAGE AND THIRD PARTY LIABILITY AS SPECIFIED UNDER THE POLICY AGREEMENT.'
+        : 'PROVIDES PROTECTION AGAINST ANY INSURED PERILS AS SPECIFIED UNDER THE COVER NOTE AGREEMENT.');
+
+    $descriptionOfRisk = $q->operative_clause ?? ($isMotor
+        ? 'Cover applies to accidental damage, fire, theft, and third-party bodily injury and property damage within the geographical limits specified in this policy.'
+        : '');
 @endphp
 
 {{-- ================================================================ --}}
@@ -323,7 +315,7 @@
 
     <div class="content">
 
-        {{-- ── Quotation Header Strip ── --}}
+        {{-- Quotation Header Strip --}}
         <table class="quotation-header-table">
             <tr>
                 <td class="label-cell" rowspan="2">QUOTATION</td>
@@ -338,249 +330,220 @@
             </tr>
         </table>
 
-        {{-- ── Client / Policy Summary ── --}}
+        {{-- Client / Policy Info --}}
         <table class="info-table">
             <tr>
                 <td class="field-label" style="width:130px;">Client Name</td>
                 <td class="field-value" colspan="3">
-                    <strong>{{ strtoupper($customer->name ?? $q->customer_name ?? '—') }}</strong>
+                    <strong>{{ strtoupper($customer->name ?? '—') }}</strong>
                 </td>
             </tr>
             <tr>
                 <td class="field-label">Address</td>
                 <td class="field-value" style="white-space:pre-line;">{{ $address }}
-TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->vrn ? '   VRN: '.$customer->vrn : '' }}</td>
+TIN: {{ $customer->tin_number ?? '—' }}{{ !empty($customer->vrn) ? '   VRN: '.$customer->vrn : '' }}</td>
                 <td class="field-label" style="width:100px;">Contacts</td>
                 <td class="field-value">Mobile: {{ $customer->phone ?? '—' }}</td>
             </tr>
             <tr>
                 <td class="field-label">Intermediary Name</td>
-                <td class="field-value">{{  'KMJ Insurance Brokers Ltd' }}</td>
+                <td class="field-value">KMJ Insurance Brokers Ltd</td>
                 <td class="field-label">Cover Period</td>
                 <td class="field-value">{{ $startDate }} &nbsp;–&nbsp; {{ $endDate }}</td>
             </tr>
             <tr>
                 <td class="field-label">Insurance Company</td>
-                <td class="field-value" colspan="3">{{ $q->insuarer->name }}</td>
+                <td class="field-value" colspan="3">{{ $insurerName }}</td>
             </tr>
             <tr>
                 <td class="field-label">Insurance Type</td>
                 <td class="field-value" colspan="3">
-                    <strong>{{ strtoupper($q->coverage->product->insurance->type ?? ($isMotor ? 'MOTOR' : 'NON-MOTOR')) }}</strong>
+                    <strong>{{ $isMotor ? 'MOTOR' : strtoupper($q->coverage->product->insurance->type ?? 'NON-MOTOR') }}</strong>
                 </td>
             </tr>
-           
         </table>
+
+        {{-- Covering Details + Description of Risk (ALL types) --}}
+        <table class="covering-table">
+            <tr>
+                <td class="covering-header">Covering Details</td>
+                <td class="covering-header">Description of Risk</td>
+            </tr>
+            <tr>
+                <td class="covering-cell" style="font-style:italic;">
+                    {{ strtoupper($coveringDetails) }}
+                </td>
+                <td class="covering-cell">
+                    {{ $descriptionOfRisk }}
+                </td>
+            </tr>
+        </table>
+
+        {{-- ══════════════════════════════════════════════════════════════ --}}
+        {{-- MOTOR LAYOUT                                                    --}}
+        {{-- ══════════════════════════════════════════════════════════════ --}}
+        @if($isMotor)
+
+        <div class="section-with-bar" style="margin-top:5px;">
+            <div class="section-bar">Quotation Details</div>
+
+            <table class="motor-items-table">
+                <thead>
+                    <tr>
+                        <th style="width:5%;">S/N</th>
+                        <th style="width:28%;">Insured Name</th>
+                        <th style="width:37%;">Vehicle Description</th>
+                        <th class="tr" style="width:15%;">Sum Insured</th>
+                        <th class="tr" style="width:15%;">Premium (TZS)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="comp-row">
+                        <td colspan="5">Comprehensive</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td style="font-weight:bold;">{{ strtoupper($customer->name ?? '—') }}</td>
+                        <td>
+                            Reg No : <strong>{{ strtoupper($motor->registration_number ?? '—') }}</strong><br>
+                            Make : <strong>{{ $motor->make ?? '—' }}</strong><br>
+                            Model : <strong>{{ $motor->model ?? '—' }}</strong><br>
+                            Chasis No : <strong>{{ strtoupper($motor->chassis_number ?? '—') }}</strong><br>
+                            Body Type : <strong>{{ strtoupper($motor->body_type ?? '—') }}</strong><br>
+                            Colour : <strong>{{ $motor->color ?? '—' }}</strong><br>
+                            Reg Year : <strong>{{ $motor->year_of_manufacture ?? '—' }}</strong>
+                        </td>
+                        <td class="tr">
+                            {{ number_format($sumInsured, 2) }}<br>
+                            <span style="font-size:8.5px;">Other Fees : 0.00</span>
+                        </td>
+                        <td class="tr">{{ number_format($premium, 2) }}</td>
+                    </tr>
+
+                    @if($hasAddons)
+                    <tr class="addon-dotted-row">
+                        <td colspan="5">
+                            <div class="addon-dotted">
+                                @foreach($addons as $addon)
+                                    @php
+                                        $addonName = $addon->addonProduct->name ?? $addon->addon_desc ?? ('Addon #' . $addon->addon_product_id);
+                                        $addonAmt  = floatval($addon->addon_amount ?? $addon->amount ?? 0);
+                                    @endphp
+                                    <span style="display:inline-block;width:64%;">{{ $addonName }}</span>
+                                    @if($addonAmt > 0)
+                                        <span style="display:inline-block;width:35%;text-align:right;">TZS {{ number_format($addonAmt, 2) }}</span>
+                                    @endif
+                                    <br>
+                                @endforeach
+                            </div>
+                        </td>
+                    </tr>
+                    @endif
+
+                    <tr><td colspan="5" style="height:4px;border:none;"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <table class="totals-table">
+            <tr>
+                <td class="tt-label">Discount :</td>
+                <td class="tt-value">{{ number_format($discount, 2) }}</td>
+            </tr>
+            <tr>
+                <td class="tt-label" style="font-weight:bold;">Total Premium:</td>
+                <td class="tt-value">{{ number_format($premium, 2) }}</td>
+            </tr>
+            <tr>
+                <td class="tt-label">VAT :</td>
+                <td class="tt-value">{{ number_format($vat, 2) }}</td>
+            </tr>
+            <tr class="tt-total">
+                <td class="tt-label">Total Receivable:</td>
+                <td class="tt-value">{{ number_format($totalReceivable, 2) }}</td>
+            </tr>
+        </table>
+
+        <div class="amount-words">
+            TZS {{ number_format($totalReceivable, 2) }} Only
+        </div>
+
+        <table class="bank-footer-row">
+            <tr>
+                <td>Bank Details</td>
+                <td style="text-align:center;">Digital Payment</td>
+            </tr>
+        </table>
+
+        @endif
+        {{-- /MOTOR --}}
 
         {{-- ══════════════════════════════════════════════════════════════ --}}
         {{-- NON-MOTOR LAYOUT                                               --}}
         {{-- ══════════════════════════════════════════════════════════════ --}}
         @if(!$isMotor)
 
-            {{-- Covering Details + Description of Risk --}}
-            <table class="covering-table" style="margin-bottom:5px;">
-                <tr>
-                    <td class="section-bar" style="width:50%;">Covering Details</td>
-                    <td class="section-bar" style="width:50%;">Description of Risk</td>
-                </tr>
-                <tr>
-                    <td class="field-value" style="font-style:italic;font-size:9px;color:#444;line-height:1.6;padding:6px 8px;">
-                        {{ strtoupper($q->cover_note_desc ?? 'PROVIDES PROTECTION AGAINST ANY INSURED PERILS AS SPECIFIED UNDER THE COVER NOTE AGREEMENT.') }}
-                    </td>
-                    <td style="border:1px solid #555;padding:6px 8px;vertical-align:top;">
-                        {{ $q->operative_clause ?? '' }}
-                    </td>
-                </tr>
-            </table>
+        <div class="section-with-bar" style="margin-top:5px;">
+            <div class="section-bar">Items Covered</div>
 
-            {{-- Quotation Details — line-item style --}}
-            <div class="section-with-bar">
-                <div class="section-bar">Quotation Details</div>
-
-                <table class="detail-col-header">
+            <table class="nonmotor-items-table">
+                <thead>
                     <tr>
-                        <td style="width:65%;">Description</td>
-                        <td style="width:35%;text-align:right;">Value</td>
+                        <th style="width:55%;">Items Covered</th>
+                        <th class="tr" style="width:22%;">Sum Insured (in TZS)</th>
+                        <th class="tr" style="width:23%;">Premium (in TZS)</th>
                     </tr>
-                </table>
-
-                @php
-                    $finKeys  = ['Total Premium (Excl. Tax)', 'Total Premium (Incl. Tax)', 'Tax Amount'];
-                    $rowIndex = 0;
-
-                    // Build detail rows with all coverage fields
-                    $quotationDetails = array_filter([
-                        'Coverage'               => $q->coverage->name ?? null,
-                        'Risk Name'              => $q->coverage->risk_name ?? null,
-                        'Risk Code'              => $q->coverage->risk_code ?? null,
-                        'Product Code'           => $q->product_code ?? null,
-                        'Sum Insured'            => $sumInsured > 0 ? number_format($sumInsured, 2) : null,
-                        'Premium Rate'           => $q->premium_rate ? number_format(floatval($q->premium_rate) * 100, 2) . '%' : null,
-                        'Coverage Rate'          => ($q->coverage->rate ?? 0) > 0 ? number_format(floatval($q->coverage->rate) * 100, 2) . '%' : null,
-                        'Minimum Amount'         => ($q->coverage->minimum_amount ?? 0) > 0 ? number_format($q->coverage->minimum_amount, 2) : null,
-                        'Currency'               => $q->currency->name ?? null,
-                        'Exchange Rate'          => $q->exchange_rate ? number_format($q->exchange_rate, 2) : null,
-                        'Commission Rate'        => $q->commission_rate ? $q->commission_rate . '%' : null,
-                        'Is Tax Exempted'        => ($q->is_tax_exempted === 'Y') ? 'Yes' : 'No',
-                    ], fn($v) => $v !== null && $v !== '' && $v !== '0.00' && $v !== '0');
-                @endphp
-
-                <div class="detail-lines-wrapper">
-                    @foreach($quotationDetails as $label => $value)
-                        @if(!in_array($label, $finKeys))
-                            @php $rowClass = ($rowIndex % 2 === 0) ? '' : 'even'; $rowIndex++; @endphp
-                            <table class="detail-line {{ $rowClass }}">
-                                <tr>
-                                    <td class="dl-label">{{ $label }}</td>
-                                    <td class="dl-value">{{ $value }}</td>
-                                </tr>
-                            </table>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- Financial Summary --}}
-            <table class="fin-table">
-                <tr>
-                    <td class="fin-label">Discount</td>
-                    <td class="fin-value">{{ number_format($discount, 2) }}</td>
-                </tr>
-                <tr>
-                    <td class="fin-label">Total Premium (Excl. Tax)</td>
-                    <td class="fin-value">{{ number_format($premium, 2) }}</td>
-                </tr>
-                <tr>
-                    <td class="fin-label">VAT / Tax Amount</td>
-                    <td class="fin-value">{{ number_format($vat, 2) }}</td>
-                </tr>
-                <tr class="fin-total">
-                    <td class="fin-label">Total Receivable (Incl. Tax)</td>
-                    <td class="fin-value">{{ number_format($totalReceivable, 2) }}</td>
-                </tr>
+                </thead>
+                <tbody>
+                    @php $rowIdx = 0; @endphp
+                    <tr class="{{ $rowIdx % 2 === 1 ? 'even' : '' }}">
+                        <td>
+                            <div class="item-desc">{{ $q->coverage->name ?? '—' }}</div>
+                            @if(!empty($q->cover_note_desc))
+                                <div class="item-subdesc">{{ $q->cover_note_desc }}</div>
+                            @elseif(!empty($q->coverage->description))
+                                <div class="item-subdesc">{{ $q->coverage->description }}</div>
+                            @endif
+                        </td>
+                        <td class="tr">{{ number_format($sumInsured, 2) }}</td>
+                        <td class="tr">{{ number_format($premium, 2) }}</td>
+                    </tr>
+                </tbody>
             </table>
+        </div>
+
+        <table class="totals-table">
+            <tr>
+                <td class="tt-label">Discount :</td>
+                <td class="tt-value">{{ number_format($discount, 2) }}</td>
+            </tr>
+            <tr>
+                <td class="tt-label" style="font-weight:bold;">Total Premium:</td>
+                <td class="tt-value">{{ number_format($premium, 2) }}</td>
+            </tr>
+            <tr>
+                <td class="tt-label">VAT :</td>
+                <td class="tt-value">{{ number_format($vat, 2) }}</td>
+            </tr>
+            <tr class="tt-total">
+                <td class="tt-label">Total Receivable:</td>
+                <td class="tt-value">{{ number_format($totalReceivable, 2) }}</td>
+            </tr>
+        </table>
+
+        <div class="amount-words">
+            TZS {{ number_format($totalReceivable, 2) }} Only
+        </div>
+
+        <table class="bank-footer-row">
+            <tr>
+                <td>Bank Details</td>
+                <td style="text-align:center;">Digital Payment</td>
+            </tr>
+        </table>
 
         @endif
         {{-- /NON-MOTOR --}}
-
-        {{-- ══════════════════════════════════════════════════════════════ --}}
-        {{-- MOTOR LAYOUT (with OR without addons)                          --}}
-        {{-- ══════════════════════════════════════════════════════════════ --}}
-        @if($isMotor)
-
-            {{-- Items table --}}
-            <div class="section-with-bar" style="margin-top:5px;">
-                <div class="section-bar">Quotation Details</div>
-
-                <table class="motor-items-table">
-                    <thead>
-                        <tr>
-                            <th style="width:5%;">S/N</th>
-                            <th style="width:28%;">Insured Name</th>
-                            <th style="width:35%;">Vehicle Description</th>
-                            <th class="tr" style="width:16%;">Sum Insured</th>
-                            <th class="tr" style="width:16%;">Premium (TZS)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{-- Comprehensive sub-heading --}}
-                        <tr class="comp-row">
-                            <td colspan="5">Comprehensive</td>
-                        </tr>
-
-                        {{-- Main vehicle row --}}
-                        <tr>
-                            <td>1</td>
-                            <td style="font-weight:bold;">
-                                {{ strtoupper($customer->name ?? $q->customer_name ?? '—') }}
-                            </td>
-                            <td>
-                                @if($motor)
-                                    Reg No : <strong>{{ strtoupper($motor->registration_number ?? '—') }}</strong><br>
-                                    Make : <strong>{{ $motor->make ?? '—' }}</strong><br>
-                                    Model : <strong>{{ $motor->model ?? '—' }}</strong><br>
-                                    Chasis No : <strong>{{ strtoupper($motor->chassis_number ?? '—') }}</strong><br>
-                                    Body Type : <strong>{{ strtoupper($motor->body_type ?? '—') }}</strong><br>
-                                    Colour : <strong>{{ $motor->color ?? '—' }}</strong><br>
-                                    Reg Year : <strong>{{ $motor->year_of_manufacture ?? '—' }}</strong>
-                                @else
-                                    {{ $q->coverage->name ?? '—' }}
-                                @endif
-                            </td>
-                            <td class="tr">
-                                {{ number_format($sumInsured, 2) }}<br>
-                                <span style="font-size:8.5px;">Other Fees : 0.00</span>
-                            </td>
-                            <td class="tr">{{ number_format($premium, 2) }}</td>
-                        </tr>
-
-                        {{-- ── ADDONS (only when motor has addons) ── --}}
-                        @if($hasAddons)
-                        <tr class="addon-dotted-row">
-                            <td colspan="5">
-                                <div class="addon-dotted">
-                                    @foreach($addons as $addon)
-                                        @php
-                                            $addonName = $addon->addonProduct->name ?? ('Addon #'.$addon->addon_product_id);
-                                            $addonAmt  = floatval($addon->amount ?? 0);
-                                        @endphp
-                                        <span style="display:inline-block;width:65%;">{{ $addonName }}</span>
-                                        @if($addonAmt > 0)
-                                            <span style="display:inline-block;width:34%;text-align:right;">
-                                                TZS {{ number_format($addonAmt, 2) }}
-                                            </span>
-                                        @endif
-                                        <br>
-                                    @endforeach
-                                </div>
-                            </td>
-                        </tr>
-                        @endif
-                        {{-- /ADDONS --}}
-
-                        {{-- Spacer --}}
-                        <tr>
-                            <td colspan="5" style="height:5px;border:none;"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            {{-- Motor totals --}}
-            <table class="totals-table-motor">
-                <tr>
-                    <td class="tt-label">Discount :</td>
-                    <td class="tt-value">{{ number_format($discount, 2) }}</td>
-                </tr>
-                <tr>
-                    <td class="tt-label" style="font-weight:bold;">Total Premium:</td>
-                    <td class="tt-value">{{ number_format($premium, 2) }}</td>
-                </tr>
-                <tr>
-                    <td class="tt-label">VAT :</td>
-                    <td class="tt-value">{{ number_format($vat, 2) }}</td>
-                </tr>
-                <tr class="tt-total">
-                    <td class="tt-label">Total Receivable:</td>
-                    <td class="tt-value">{{ number_format($totalReceivable, 2) }}</td>
-                </tr>
-            </table>
-
-            {{-- Amount in words --}}
-            <div class="amount-words">
-                TZS {{ number_format($totalReceivable, 2) }} Only
-            </div>
-
-            {{-- Bank / Digital footer bar --}}
-            <table class="bank-footer-row">
-                <tr>
-                    <td>Bank Details</td>
-                    <td style="text-align:center;">Digital Payment</td>
-                </tr>
-            </table>
-
-        @endif
-        {{-- /MOTOR --}}
 
     </div>{{-- /.content --}}
 
@@ -611,7 +574,6 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->
 
     <div class="content">
 
-        {{-- Header strip repeat --}}
         <table class="quotation-header-table" style="margin-bottom:10px;">
             <tr>
                 <td class="label-cell" rowspan="2">QUOTATION</td>
@@ -626,12 +588,9 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->
             </tr>
         </table>
 
-        {{-- Bank details two-column --}}
         <table class="bank-split-table">
             <tr>
-                {{-- LEFT — bank list --}}
                 <td style="width:50%;padding-right:6px;vertical-align:top;font-size:9.5px;line-height:1.6;">
-
                     <strong>FOLLOWING ARE OUR BANK DETAILS FOR PREMIUM PAYMENTS:</strong><br><br>
                     <strong>Account Name: {{ $insurerName }}</strong><br><br>
 
@@ -666,7 +625,6 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->
                     </div>
                 </td>
 
-                {{-- RIGHT — digital / NMB/CRDB / Selcom --}}
                 <td style="width:50%;padding-left:6px;vertical-align:top;font-size:9.5px;line-height:1.75;">
                     <div class="bank-block">
                         <strong>For payment through NMB/CRDB Channels:</strong><br>
@@ -684,8 +642,6 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->
             </tr>
         </table>
 
-        {{-- Notes + Issued By (shown on page 2 for MOTOR, on page 3 for non-motor) --}}
-        @if($isMotor)
         <table class="issued-by-table" style="width:100%;border-collapse:collapse;margin-top:10px;margin-bottom:6px;">
             <tr>
                 <td style="font-size:9px;color:#444;line-height:1.8;vertical-align:top;width:70%;">
@@ -703,7 +659,8 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->
             For, KMJ Insurance Brokers Ltd
         </div>
 
-        {{-- Customer Declaration on page 2 for motor --}}
+        {{-- Declaration on page 2 for MOTOR --}}
+        @if($isMotor)
         <div class="section-with-bar">
             <div class="section-bar">Customer Declaration</div>
             <div class="declaration-block">
@@ -739,7 +696,7 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ isset($customer->vrn) && $customer->
 {{-- /PAGE 2 --}}
 
 {{-- ================================================================ --}}
-{{--  PAGE 3 — NON-MOTOR ONLY: Terms & Declaration                     --}}
+{{--  PAGE 3 — NON-MOTOR ONLY: Declaration                             --}}
 {{-- ================================================================ --}}
 @if(!$isMotor)
 <div class="page-break"></div>

@@ -393,7 +393,7 @@
                                         </div>
 
                                         <div class="col-4 d-flex justify-content-center">
-                                            <a href="{{ route('kmj.report') }}"
+                                            <a href="{{ route('kmj.quotation.report') }}"
                                                 class="d-block w-100 text-decoration-none">
                                                 <div
                                                     class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 shadow-lg mt-3 w-100 h-100">

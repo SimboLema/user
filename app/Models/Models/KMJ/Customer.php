@@ -49,4 +49,9 @@ class Customer extends Model
     {
         return $this->belongsTo(District::class, 'district_id');
     }
+
+    public function region()
+{
+    return $this->hasOneThrough(Region::class, District::class, 'id', 'id', 'district_id', 'region_id');
+}
 }

@@ -324,6 +324,7 @@ class QuotationController extends Controller
 
     public function store(Request $request)
     {
+        
 
         try {
             $customer_id = $request->customer_id;
@@ -513,6 +514,42 @@ class QuotationController extends Controller
             ];
 
             $quotation = Quotation::create($quotationData);
+            // ADD THIS RIGHT AFTER: $quotation = Quotation::create($quotationData);
+// -----------------------------------------------------------------------
+
+// Save Addons
+if ($request->filled('addon_ids') && is_array($request->addon_ids)) {
+    foreach ($request->addon_ids as $addonProductId) {
+        $addonProduct = \App\Models\Models\KMJ\AddonProduct::find($addonProductId);
+        if (!$addonProduct) continue;
+
+        // Calculate addon premium
+        $addonRate   = floatval($addonProduct->rate ?? 0);
+        $addonAmount = $addonRate > 0
+            ? round($premiumExcludingTax * $addonRate, 2)
+            : floatval($addonProduct->amount ?? 0);
+
+        $addonTaxAmount          = round($addonAmount * $taxRate, 2);
+        $addonPremiumIncludingTax = $addonAmount + $addonTaxAmount;
+
+        \App\Models\Models\KMJ\Addon::create([
+            'quotation_id'                    => $quotation->id,
+            'addon_product_id'                => $addonProduct->id,
+            'addon_reference'                 => $addonProduct->id,
+            'addon_desc'                      => $addonProduct->description ?? $addonProduct->name ?? '',
+            'addon_amount'                    => $addonAmount,
+            'addon_rate'                      => $addonRate,
+            'premium_excluding_tax'           => $addonAmount,
+            'premium_excluding_tax_equivalent'=> $addonAmount,
+            'premium_including_tax'           => $addonPremiumIncludingTax,
+            'tax_code'                        => $taxCode,
+            'is_tax_exempted'                 => $is_tax_exempted,
+            'tax_rate'                        => $taxRate,
+            'tax_amount'                      => $addonTaxAmount,
+        ]);
+    }
+}
+// -----------------------------------------------------------------------
 
             $payment = new Payment();
             $payment->quotation_id = $quotation->id;
@@ -984,14 +1021,18 @@ public function saveAddons(Request $request, $id)
 }
 
 
-    public function downloadQuotation($id)
-    {
+
+public function downloadQuotation($id)
+{
     $quotation = Quotation::with([
         'customer',
+        'customer.district',
         'coverage',
         'coverage.product',
         'coverage.product.insurance',
-        'insuarer'
+        'insuarer',
+        'quotationAddons',
+        'quotationAddons.addonProduct',
     ])->find($id);
 
     if (!$quotation) {
@@ -999,58 +1040,30 @@ public function saveAddons(Request $request, $id)
         return back()->with('error', 'Quotation haijapatikana.');
     }
 
-    Log::info("Quotation loaded, generating PDF", ['quotation_id' => $quotation->id]);
-
-    //  Build details array (moved from Blade)
-    $quotationDetails = [
-        'Customer Name' => ucwords(strtolower($quotation->customer->name ?? '')),
-        'Product' => ucwords(strtolower($quotation->coverage->product->name ?? '')),
-        'Coverage' => ucwords(strtolower($quotation->coverage->risk_name ?? '')),
-        'Insurer Name' => ucwords(strtolower($quotation->insuarer->name ?? '')),
-        'Intermediary' => 'KMJ Insurance Brokers Ltd',
-
-        'Cover Note Start Date' => optional($quotation->cover_note_start_date)->format('d M Y'),
-        'Cover Note End Date' => optional($quotation->cover_note_end_date)->format('d M Y'),
-
-        'Exchange Rate' => number_format($quotation->exchange_rate ?? 0, 2),
-
-        'Total Premium (Excl. Tax)' => number_format($quotation->total_premium_excluding_tax ?? 0, 2),
-        'Total Premium (Incl. Tax)' => number_format($quotation->total_premium_including_tax ?? 0, 2),
-    ];
-
-    //  Additional financial details (only if not fleet)
-    if (empty($quotation->fleet_id)) {
-        $quotationDetails['Sum Insured'] = number_format($quotation->sum_insured ?? 0, 2);
-        $quotationDetails['Premium Rate (%)'] = number_format(($quotation->premium_rate ?? 0) * 100, 2);
-        $quotationDetails['Premium Before Discount'] = number_format($quotation->premium_before_discount ?? 0, 2);
-        $quotationDetails['Premium After Discount'] = number_format($quotation->premium_after_discount ?? 0, 2);
-        $quotationDetails['Premium Excl. Tax (Equivalent)'] = number_format($quotation->premium_excluding_tax_equivalent ?? 0, 2);
-        $quotationDetails['Premium Incl. Tax'] = number_format($quotation->premium_including_tax ?? 0, 2);
-        $quotationDetails['Tax Rate (%)'] = number_format(($quotation->tax_rate ?? 0) * 100, 2);
-        $quotationDetails['Tax Amount'] = number_format($quotation->tax_amount ?? 0, 2);
-
-        if (optional($quotation->coverage->product)->insurance_id == 2) {
-            $quotationDetails['Sticker Number'] = $quotation->sticker_number ?? '';
-        }
-
-        $quotationDetails['Cover Note Reference'] = $quotation->cover_note_reference ?? '';
+    // Build motor stdClass directly from quotation columns
+    $motor = null;
+    if (intval($quotation->coverage->product->insurance_id ?? 0) === 2
+        || !empty($quotation->registration_number)
+    ) {
+        $motor = new \stdClass();
+        $motor->registration_number = $quotation->registration_number;
+        $motor->chassis_number      = $quotation->chassis_number;
+        $motor->make                = $quotation->make;
+        $motor->model               = $quotation->model;
+        $motor->body_type           = $quotation->body_type;
+        $motor->color               = $quotation->color;
+        $motor->year_of_manufacture = $quotation->year_of_manufacture;
+        $motor->engine_number       = $quotation->engine_number;
+        $motor->sitting_capacity    = $quotation->sitting_capacity;
     }
 
-    //Status fields
-    $quotationDetails['Acknowledgement Status Code'] = $quotation->acknowledgement_status_code ?? '';
-    $quotationDetails['Acknowledgement Status Description'] = $quotation->acknowledgement_status_desc ?? '';
-    $quotationDetails['Response Status Code'] = $quotation->response_status_code ?? '';
-    $quotationDetails['Response Status Description'] = $quotation->response_status_desc ?? '';
-    $quotationDetails['Request ID'] = $quotation->request_id ?? '';
-
-    //Pass BOTH variables to Blade
     $pdf = Pdf::loadView(
         'kmj.quotation.downloads.quotation_pdf',
-        compact('quotation', 'quotationDetails')
+        compact('quotation', 'motor')
     );
 
     return $pdf->stream('quotation_' . $quotation->id . '.pdf');
-    }
+}
 
 
     public function downloadPayment($id)
