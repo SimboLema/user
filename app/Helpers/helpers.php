@@ -68,27 +68,37 @@ function generateTiraXml($data, $signature): string
 
 function TiraRequest($endPoint, $data): array
 {
+    // Generate signature
     $signature = EncryptionServiceController::createTiramisSignature($data);
+
+    // Generate XML
     $xml = generateTiraXml($data, $signature);
 
-    $res = Http::withOptions(['verify' => false])
-        ->timeout(120) // Added on
-        ->retry(3, 500) // same
-        ->withHeaders([
-            'ClientCode'   => 'IB10152',
-            'ClientKey'    => '1Xr@Jnq74&cYaSl2',
-            'SystemCode'   => 'TP_KMJ_001',
-            'SystemName'   => 'KMJ System',
-        ])
-        ->withBody($xml, 'application/xml')
-        ->post($endPoint)
-        ->body();
+    // Send request
+    $res = Http::withOptions([
+        'verify' => false,
+        'cert' => public_path('tiramis_certs/certificate.pem'),
+        'ssl_key' => public_path('tiramis_certs/private_key.pem'),
+    ])
+    ->timeout(120)
+    ->retry(3, 500)
+    ->withHeaders([
+        'ClientCode' => 'IB10152',
+        'ClientKey'  => '1Xr@Jnq74&cYaSl2',
+        'SystemCode' => 'TP_KMJ_001',
+        'SystemName' => 'KMJ System',
+    ])
+    ->withBody($xml, 'application/xml')
+    ->post($endPoint)
+    ->body();
 
-    Log::channel('tiramisxml')->info("ACKNOLGMENT",[$res]);
+    // Log response
+    Log::channel('tiramisxml')->info("ACKNOWLEDGMENT", [$res]);
 
-    return ["response" => $res];
+    return [
+        "response" => $res
+    ];
 }
-
 function TiraRequestCallBack($data): array
 {
     $signature = EncryptionServiceController::createTiramisSignature($data);
