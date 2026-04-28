@@ -310,7 +310,7 @@
                             <tbody>
                                 @forelse($addons ?? [] as $addon)
                                     @php
-                                        
+
                                         $isChecked = false;
 
                                         if ($addon->amount_type === 'PREMIUM') {
@@ -1127,50 +1127,160 @@
         let pdfBlobUrl = null;
 
         function downloadQuotationPreview() {
-            const form = document.querySelector('form[action="{{ route('kmj.quotation.store') }}"]');
 
-            if (!form) {
-                alert('Form not found!');
-                return;
-            }
+            // ── Helper to get field value by name ──
+            const gv = name => {
+                const el = document.querySelector(`[name="${name}"]`);
+                return el ? el.value : '';
+            };
+            const gi = id => {
+                const el = document.getElementById(id);
+                return el ? el.value : '';
+            };
 
-            // Show overlay & loading
-            document.getElementById('pdf-preview-overlay').style.display = 'block';
-            document.getElementById('pdf-loading').style.display          = 'flex';
-            document.getElementById('pdf-preview-iframe').style.display   = 'none';
+            // ── Build data object explicitly — never rely on FormData for dynamic fields ──
+            const data = {
+                // CSRF
+                _token: document.querySelector('input[name="_token"]').value,
 
-            if (pdfBlobUrl) {
-                window.URL.revokeObjectURL(pdfBlobUrl);
-                pdfBlobUrl = null;
-            }
+                // Hidden policy fields
+                insuarer_id:   gv('insuarer_id'),
+                coverage_id:   gv('coverage_id'),
+                insurance_id:  gv('insurance_id'),
+                product_id:    gv('product_id'),
+                risk_code:     gv('risk_code'),
+                product_code:  gv('product_code'),
 
-            // FormData picks up all inputs including our hidden ones
-            const formData = new FormData(form);
+                // Customer
+                customer_id:   gi('customer_id'),
+                customer_name: gi('customer_name'),
+                customer_phone:gi('customer_phone'),
+                customer_email:gi('customer_email'),
+
+                // New customer fields (if existing customer not selected)
+                name:                    gv('name'),
+                phone:                   gv('phone'),
+                email_address:           gv('email_address'),
+                tin_number:              gv('tin_number'),
+                postal_address:          gv('postal_address'),
+                street:                  gv('street'),
+                gender:                  gv('gender'),
+                dob:                     gv('dob'),
+                policy_holder_id_number: gv('policy_holder_id_number'),
+
+                // Coverage/insurance labels (from hidden inputs)
+                coverage_name:   gi('h_coverage_name'),
+                coverage_rate:   gi('h_coverage_rate'),
+                product_name:    gi('h_product_name'),
+                insurance_type:  gi('h_insurance_type'),
+                insurance_name:  gi('h_insurance_name'),
+                insuarer_name:   gi('h_insuarer_name'),
+
+                // Duration
+                cover_note_duration_id: gv('cover_note_duration_id'),
+                cover_note_start_date:  gv('cover_note_start_date'),
+                cover_note_end_date:    gi('h_cover_note_end_date'),
+                cover_note_desc:        gv('cover_note_desc'),
+                operative_clause:       gv('operative_clause'),
+                currency_id:            gv('currency_id'),
+                exchange_rate:          gv('exchange_rate'),
+
+                // Financial — from hidden inputs synced by calculate()
+                sum_insured:                    gv('sum_insured'),
+                premium_rate:                   gi('h_premium_rate'),
+                premium:                        gi('h_premium'),
+                tax_rate:                       gi('h_tax_rate'),
+                tax_amount:                     gi('h_tax_amount'),
+                total_premium_excluding_tax:    gi('h_total_premium_excluding_tax'),
+                total_premium_including_tax:    gi('h_total_premium_including_tax'),
+                commission_rate:                gv('commission_rate'),
+                commission_paid:                gv('commission_paid'),
+                is_tax_exempted:                gv('is_tax_exempted'),
+
+                // Motor fields
+                motor_category_id:   gv('motor_category_id'),
+                motor_type_id:       gv('motor_type_id'),
+                registration_number: gv('registration_number'),
+                chassis_number:      gv('chassis_number'),
+                make:                gv('make'),
+                model:               gv('model'),
+                model_number:        gv('model_number'),
+                body_type:           gv('body_type'),
+                color:               gv('color'),
+                engine_number:       gv('engine_number'),
+                engine_capacity:     gv('engine_capacity'),
+                fuel_used:           gv('fuel_used'),
+                number_of_axles:     gv('number_of_axles'),
+                sitting_capacity:    gv('sitting_capacity'),
+                year_of_manufacture: gv('year_of_manufacture'),
+                tare_weight:         gv('tare_weight'),
+                gross_weight:        gv('gross_weight'),
+                motor_usage_id:      gv('motor_usage_id'),
+                owner_category_id:   gv('owner_category_id'),
+
+                // Payment
+                payment_mode_id: gv('payment_mode_id'),
+            };
+
+            // ── addon_ids[] — checked checkboxes only ──
+            data['addon_ids'] = [...document.querySelectorAll('input[name="addon_ids[]"]:checked')]
+                .map(el => el.value);
+
+            // ── items_covered rows (non-motor) ──
+            const itemsCovered = [];
+            document.querySelectorAll('#items-covered-wrapper .item-covered-row').forEach((row, index) => {
+                const nameEl       = row.querySelector(`input[name="items_covered[${index}][name]"]`);
+                const sumInsuredEl = row.querySelector(`input[name="items_covered[${index}][sum_insured]"]`);
+                const premiumEl    = row.querySelector(`input[name="items_covered[${index}][premium]"]`);
+                const name         = nameEl?.value?.trim() ?? '';
+                if (name) {
+                    itemsCovered.push({
+                        name,
+                        sum_insured: sumInsuredEl?.value ?? 0,
+                        premium:     premiumEl?.value ?? 0,
+                    });
+                }
+            });
+            data['items_covered'] = JSON.stringify(itemsCovered);
+
+            // ── Show loading overlay ──
+            const overlay = document.getElementById('pdf-preview-overlay');
+            const loading = document.getElementById('pdf-loading');
+            const iframe  = document.getElementById('pdf-preview-iframe');
+            overlay.style.display = 'block';
+            loading.style.display = 'flex';
+            iframe.style.display  = 'none';
+            iframe.src = 'about:blank';
 
             fetch('{{ route("kmj.quotation.preview.download") }}', {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: formData,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': data._token,
+                    'Accept': 'application/pdf',
+                },
+                body: JSON.stringify(data),
             })
-            .then(res => {
-                if (!res.ok) return res.text().then(t => { throw new Error(t) });
-                return res.blob();
+            .then(response => {
+                if (!response.ok) throw new Error('Server returned ' + response.status);
+                return response.blob();
             })
             .then(blob => {
+                if (pdfBlobUrl) window.URL.revokeObjectURL(pdfBlobUrl);
                 pdfBlobUrl = window.URL.createObjectURL(blob);
-                const iframe = document.getElementById('pdf-preview-iframe');
-                iframe.src = pdfBlobUrl;
-                document.getElementById('pdf-loading').style.display        = 'none';
-                document.getElementById('pdf-preview-iframe').style.display = 'block';
+                iframe.src            = pdfBlobUrl;
+                loading.style.display = 'none';
+                iframe.style.display  = 'block';
             })
             .catch(err => {
-                closePdfPreview();
-                console.error(err);
-                alert('Could not generate preview:\n' + err.message);
+                loading.style.display = 'none';
+                overlay.style.display = 'none';
+                alert('Preview failed: ' + err.message);
+                console.error('Preview error:', err);
             });
         }
 
-        function downloadFromPreview() {
+         function downloadFromPreview() {
             if (!pdfBlobUrl) return;
             const a   = document.createElement('a');
             a.href     = pdfBlobUrl;

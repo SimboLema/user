@@ -495,19 +495,43 @@ TIN: {{ $customer->tin_number ?? '—' }}{{ !empty($customer->vrn) ? '   VRN: '.
                     </tr>
                 </thead>
                 <tbody>
-                    @php $rowIdx = 0; @endphp
-                    <tr class="{{ $rowIdx % 2 === 1 ? 'even' : '' }}">
+                @php
+                    // Decode items_covered — works for both DB (json column) and preview (json string)
+                    $itemsCovered = [];
+                    if (!empty($q->items_covered)) {
+                        $decoded = is_array($q->items_covered)
+                            ? $q->items_covered
+                            : json_decode($q->items_covered, true);
+                        // Filter out empty rows
+                        $itemsCovered = array_filter($decoded ?? [], fn($i) => !empty($i['name']));
+                    }
+                    $rowIdx = 0;
+                @endphp
+
+                @if(count($itemsCovered) > 0)
+                    @foreach($itemsCovered as $item)
+                        <tr class="{{ $rowIdx % 2 === 1 ? 'even' : '' }}">
+                            <td>
+                                <div class="item-desc">{{ $item['name'] ?? '—' }}</div>
+                            </td>
+                            <td class="tr">{{ number_format(floatval($item['sum_insured'] ?? 0), 2) }}</td>
+                            <td class="tr">{{ number_format(floatval($item['premium'] ?? 0), 2) }}</td>
+                        </tr>
+                        @php $rowIdx++; @endphp
+                    @endforeach
+                @else
+                    {{-- Fallback: single row from coverage --}}
+                    <tr>
                         <td>
                             <div class="item-desc">{{ $q->coverage->name ?? '—' }}</div>
-                            @if(!empty($q->cover_note_desc))
-                                <div class="item-subdesc">{{ $q->cover_note_desc }}</div>
-                            @elseif(!empty($q->coverage->description))
+                            @if(!empty($q->coverage->description))
                                 <div class="item-subdesc">{{ $q->coverage->description }}</div>
                             @endif
                         </td>
                         <td class="tr">{{ number_format($sumInsured, 2) }}</td>
                         <td class="tr">{{ number_format($premium, 2) }}</td>
                     </tr>
+                @endif
                 </tbody>
             </table>
         </div>
