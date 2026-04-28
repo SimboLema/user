@@ -80,7 +80,7 @@ function TiraRequest($endPoint, $data): array
         'cert' => public_path('tiramis_certs/certificate.pem'),
         'ssl_key' => public_path('tiramis_certs/private_key.pem'),
     ])
-    ->timeout(120)
+    ->timeout(0)
     ->retry(3, 500)
     ->withHeaders([
         'ClientCode' => 'IB10152',
