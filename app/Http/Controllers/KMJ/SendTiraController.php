@@ -17,7 +17,7 @@ class SendTiraController extends Controller
     private string $baseUrl;
     public function __construct()
     {
-        $this->baseUrl = 'https://192.168.168.200:8091';
+        $this->baseUrl = 'https://api.tira.go.tz:8091';
     }
 
 
@@ -49,7 +49,7 @@ class SendTiraController extends Controller
                             'RequestId' => $requestId,
                             'CompanyCode' => 'IB10152',
                             'SystemCode' => 'TP_KMJ_001',
-                            'CallBackUrl' => "https://suretech.co.tz/api/tiramis/callback",
+                            'CallBackUrl' => "http://192.168.168.200:8080/api/tiramis/callback",
                             'InsurerCompanyCode' => $quotation->insuarer->Insuarer_code,
                             'TranCompanyCode' => 'IB10152',
                             'CoverNoteType' => $quotation->cover_note_type_id,
@@ -518,7 +518,7 @@ class SendTiraController extends Controller
                             'RequestId' => generateRequestID(),
                             'CompanyCode' => 'IB10152',
                             'SystemCode' => 'TP_KMJ_001',
-                            'CallBackUrl' => "https://suretech.co.tz/api/tiramis/callback",
+                            'CallBackUrl' => "http://192.168.168.200:8080/api/tiramis/callback",
                             'InsurerCompanyCode' => 'ICC125',
                             'TranCompanyCode' => 'IB10152',
                             'CoverNoteType' => $quotation->cover_note_type_id,
@@ -693,7 +693,7 @@ class SendTiraController extends Controller
                             'RequestId' => generateRequestID(),
                             'CompanyCode' => 'IB10152',
                             'SystemCode' => 'TP_KMJ_001',
-                            'CallBackUrl' => "https://suretech.co.tz/api/tiramis/callback",
+                            'CallBackUrl' => "http://192.168.168.200:8080/api/tiramis/callback",
                             'InsurerCompanyCode' => 'ICC125',
                             'TranCompanyCode' => 'IB10152',
                             'CoverNoteType' => $quotation->cover_note_type_id,
@@ -923,7 +923,7 @@ class SendTiraController extends Controller
                             'RequestId' => generateRequestID(),
                             'CompanyCode' => 'IB10152',
                             'SystemCode' => 'TP_KMJ_001',
-                            'CallBackUrl' => "https://suretech.co.tz/api/tiramis/callback",
+                            'CallBackUrl' => "http://192.168.168.200:8080/api/tiramis/callback",
                             'InsurerCompanyCode' => 'ICC125',
                             'TranCompanyCode' => 'IB10152',
                             'CoverNoteType' => $quotation->cover_note_type_id,
@@ -1312,7 +1312,7 @@ class SendTiraController extends Controller
                             'RequestId' => generateRequestID(),
                             'CompanyCode' => 'IB10152',
                             'SystemCode' => 'TP_KMJ_001',
-                            'CallBackUrl' => "https://suretech.co.tz/api/tiramis/callback",
+                            'CallBackUrl' => "http://192.168.168.200:8080/api/tiramis/callback",
                             'InsurerCompanyCode' => 'ICC125',
                             'TranCompanyCode' => 'IB10152',
                             'CoverNoteType' => $quotation->cover_note_type_id,
@@ -1624,7 +1624,7 @@ class SendTiraController extends Controller
                             'RequestId' => generateRequestID(),
                             'CompanyCode' => 'IB10152',
                             'SystemCode' => 'TP_KMJ_001',
-                            'CallBackUrl' => "https://suretech.co.tz/api/tiramis/callback",
+                            'CallBackUrl' => "http://192.168.168.200:8080/api/tiramis/callback",
                             'InsurerCompanyCode' => 'ICC125',
                             'TranCompanyCode' => 'IB10152',
                             'CoverNoteType' => 3,
@@ -1816,7 +1816,7 @@ class SendTiraController extends Controller
                             'RequestId' => generateRequestID(),
                             'CompanyCode' => 'IB10152',
                             'SystemCode' => 'TP_KMJ_001',
-                            'CallBackUrl' => "https://suretech.co.tz/api/tiramis/callback",
+                            'CallBackUrl' => "http://192.168.168.200:8080/api/tiramis/callback",
                             'InsurerCompanyCode' => 'ICC125',
                             'TranCompanyCode' => 'IB10152',
                             'CoverNoteType' => $quotation->cover_note_type_id,

@@ -177,6 +177,19 @@
                                     </div>
 
                                     <div class="col-md-2">
+                                        <label class="form-label">Insurer</label>
+                                        <select class="form-select select2" name="insurer_id">
+                                            <option value="">-- Select Insurer --</option>
+                                            @foreach ($insurers as $insurer)
+                                                <option value="{{ $insurer->id }}"
+                                                    {{ request('insurer_id') == $insurer->id ? 'selected' : '' }}>
+                                                    {{ $insurer->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-2">
                                         <label class="form-label">Insurance Type</label>
                                         <select class="form-select select2" id="insuranceSelect" name="insurance_id">
                                             <option value="">-- Select Insurance --</option>

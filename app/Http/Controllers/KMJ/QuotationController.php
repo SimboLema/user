@@ -96,6 +96,20 @@ class QuotationController extends Controller
         }
 
         // -----------------------------
+        // FILTER BY INSURER
+        // -----------------------------
+        if ($request->filled('insurer_id')) {
+            $insurerId = $request->insurer_id;
+            $query->where('insuarer_id', $insurerId);
+        }
+
+        $insurers = Insuarer::all(); // make sure it's imported at the top
+
+        $quotations = $query->orderBy('id', 'asc')->get();
+
+        return view('kmj.quotation.report', compact('quotations', 'insurance', 'insurers'));
+
+        // -----------------------------
         // FILTER BY INSURANCE
         // -----------------------------
         if ($request->filled('insurance_id')) {
