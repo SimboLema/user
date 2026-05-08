@@ -50,3 +50,8 @@ include_once('Strategies_api.php');
 include_once('mua_api.php');
 
 
+use App\Http\Controllers\KMJ\Api\MotorVerificationController;
+
+Route::post('/motor/verification', [MotorVerificationController::class, 'verify']);
+
+
