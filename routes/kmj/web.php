@@ -42,8 +42,9 @@ Route::middleware(['auth'])->group(function () {
     //KMJ Routes
     Route::prefix('dash')->group(function () {
 
-        Route::get('/', [KMJServiceController::class, 'index'])->name('kmj.index');
-
+       Route::get('/', [KMJServiceController::class, 'index'])->name('kmj.index');
+       
+       // Route::get('/', function() { dd ( file_get_contents(public_path('tiramis_certs/private_key_new.pem')));});//[KMJServiceController::class, 'index'])->name('kmj.index');
 
         //ADMIN NA INSUARER
         Route::prefix('admin')->name('admin.')->group(function () {

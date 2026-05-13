@@ -14,7 +14,7 @@ class EncryptionServiceController extends Controller
 
             $encry_method = 'sha1WithRSAEncryption';
             //$private_key = env('TIRAMIS_PRIVATE_KEY');
-            $privateKeyPath = public_path('tiramis_certs/private_key.pem');
+            $privateKeyPath = public_path('tiramis_certs/private_key_new.pem');
             $privateKey = openssl_pkey_get_private(file_get_contents($privateKeyPath));
             openssl_sign($data, $signature, $privateKey, $encry_method);
 

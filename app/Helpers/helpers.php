@@ -1,8 +1,5 @@
 <?php
 
-
-
-
 //return unique request id to be used on tiramis request
 use App\Http\Controllers\KMJ\EncryptionServiceController;
 use App\Models\Product;
@@ -68,37 +65,67 @@ function generateTiraXml($data, $signature): string
 
 function TiraRequest($endPoint, $data): array
 {
-    $signature = EncryptionServiceController::createTiramisSignature($data);
+    try {
 
-    $xml = generateTiraXml($data, $signature);
+        $signature = EncryptionServiceController::createTiramisSignature($data);
 
-    $response = Http::withOptions([
-        'verify' => false,
-        'cert' => [
-            public_path('tiramis_certs/public_certificate.pfx'),
-            'r00t@2025'
-        ],
-        
-    ])
-    ->timeout(120)
-    ->retry(2, 500)
-    ->withHeaders([
-        'ClientCode' => 'IB10152',
-        'ClientKey'  => '1Xr@Jnq74&cYaSl2',
-        'SystemCode' => 'TP_KMJ_001',
-        'SystemName' => 'KMJ System',
-        'Content-Type' => 'application/xml',
-    ])
-    ->withBody($xml, 'application/xml')
-    ->post($endPoint);
+        $xml = generateTiraXml($data, $signature);
 
-    Log::channel('tiramisxml')->info('STATUS: ' . $response->status());
-    Log::channel('tiramisxml')->info('BODY: ' . $response->body());
+        Log::channel('tiramisxml')->info('REQUEST XML:');
+        Log::channel('tiramisxml')->info($xml);
 
-    return [
-        "status" => $response->status(),
-        "response" => $response->body()
-    ];
+        $response = Http::withOptions([
+
+            // TEMPORARY FOR TESTING
+            'verify' => false,
+
+            // CLIENT CERTIFICATE
+
+            'cert' => public_path('tiramis_certs/certificate_new.pem'),
+
+            // PRIVATE KEY
+            'ssl_key' => public_path('tiramis_certs/private_key_new.pem'),
+
+            // FORCE TLS 1.2
+            'curl' => [
+                CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+            ],
+
+            // CONNECTION TIMEOUT
+            'connect_timeout' => 60,
+
+        ])
+        ->timeout(120)
+        ->withHeaders([
+            'ClientCode' => 'IB10152',
+            'ClientKey'  => '1Xr@Jnq74&cYaSl2',
+            'SystemCode' => 'TP_KMJ_001',
+            'SystemName' => 'KMJ System',
+            'Content-Type' => 'application/xml',
+            'Accept' => 'application/xml',
+        ])
+        ->withBody($xml, 'application/xml')
+        ->post($endPoint);
+
+        Log::channel('tiramisxml')->info('STATUS: ' . $response->status());
+        Log::channel('tiramisxml')->info('RESPONSE: ' . $response->body());
+
+        return [
+            'status' => $response->status(),
+            'response' => $response->body(),
+        ];
+
+    } catch (\Throwable $e) {
+
+        Log::channel('tiramisxml')->error('TIRA ERROR: ' . $e->getMessage());
+
+        Log::channel('tiramisxml')->error($e->getTraceAsString());
+
+        return [
+            'status' => 500,
+            'response' => $e->getMessage(),
+        ];
+    }
 }
 
 
